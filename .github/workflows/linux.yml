@@ -1,0 +1,55 @@
+name: Build and Test Workflow
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        compiler: [gcc-14, clang-18]
+        build_type: [Debug, Release]
+        sanitizer: [address, others]
+        include:
+          - compiler: gcc-14
+            install: |
+              sudo apt install gcc-14
+              sudo apt install libomp-18-dev mold ninja-build
+          - compiler: clang-18
+            install: |
+              sudo apt install clang-18
+              sudo apt installlibomp-18-dev libc++-18-dev mold ninja-build 
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        ${{ matrix.install }}
+
+    - name: Configure
+      env:
+        CC: ${{ matrix.compiler }}
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
+              -Bbuild \
+              -GNinja \
+              -DEPOLL_WEB_ENABLE_STRICT_STL_CHECKS=ON \
+              -DEPOLL_WEB_ENABLE_ADDRESS_SANITIZER=${{ matrix.sanitizer == 'address' && 'ON' || 'OFF' }} \
+              -DEPOLL_WEB_ENABLE_UNDEFINED_SANITIZER=${{ matrix.sanitizer == 'others' && 'ON' || 'OFF' }} \
+              -DEPOLL_WEB_ENABLE_THREAD_SANITIZER=${{ matrix.sanitizer == 'others' && 'ON' || 'OFF' }} \
+              -DEPOLL_WEB_ENABLE_MOLD=ON \
+              -DEPOLL_WEB_ENABLE_AVX2=ON \
+              $GITHUB_WORKSPACE
+
+    - name: Build
+      run: |
+        cmake --build build --config ${{matrix.build_type}} --parallel
