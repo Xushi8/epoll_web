@@ -12,11 +12,10 @@
 void client1(void)
 {
     // 1. 获取服务器地址信息
-    struct addrinfo hints, *res;
+    struct addrinfo hints = {}, *res;
     int ret;
 
     // 设置 hints
-    memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET6;      // IPv6
     hints.ai_socktype = SOCK_STREAM; // TCP
 
