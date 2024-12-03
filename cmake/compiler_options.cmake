@@ -78,8 +78,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # add_compile_options(-floop-nest-optimize)
     # add_link_options(-floop-nest-optimize)
 
-    add_compile_options(-fconstexpr-ops-limit=1000000000 -fconstexpr-loop-limit=100000000)
-    add_link_options(-fconstexpr-ops-limit=1000000000 -fconstexpr-loop-limit=100000000)
+    add_compile_options(
+        $<$<COMPILE_LANGUAGE:CXX>:-fconstexpr-ops-limit=1000000000>
+        $<$<COMPILE_LANGUAGE:CXX>:-fconstexpr-loop-limit=100000000>
+    )
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
