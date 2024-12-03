@@ -1,34 +1,55 @@
 #include <epoll_learn/network/client1.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
+#include <netdb.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 void client1(void)
 {
-    // 1. 创建通信的套接字
-    int fd = socket(AF_INET6, SOCK_STREAM, 0);
+    // 1. 获取服务器地址信息
+    struct addrinfo hints, *res;
+    int ret;
+
+    // 设置 hints
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET6;      // IPv6
+    hints.ai_socktype = SOCK_STREAM; // TCP
+
+    // 使用 getaddrinfo 获取服务器的地址信息
+    ret = getaddrinfo("localhost", "10000", &hints, &res);
+    if (ret != 0)
+    {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(ret));
+        exit(1);
+    }
+
+    // 2. 创建套接字
+    int fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (fd == -1)
     {
         perror("socket");
-        exit(0);
+        freeaddrinfo(res); // 释放 getaddrinfo 返回的内存
+        exit(1);
     }
 
-    // 2. 连接服务器
-    struct sockaddr_in6 addr;
-    addr.sin6_family = AF_INET6;
-    addr.sin6_port = htons(10000); // 大端端口
-    inet_pton(AF_INET6, "::1", &addr.sin6_addr);
-
-    int ret = connect(fd, (struct sockaddr*)&addr, sizeof(addr));
+    // 3. 连接服务器
+    ret = connect(fd, res->ai_addr, res->ai_addrlen);
     if (ret == -1)
     {
         perror("connect");
-        exit(0);
+        close(fd);
+        freeaddrinfo(res); // 释放 getaddrinfo 返回的内存
+        exit(1);
     }
 
-    // 3. 和服务器端通信
+    freeaddrinfo(res); // 连接成功后可以释放 res
+
+    // 4. 和服务器端通信
     int number = 0;
     while (1)
     {
