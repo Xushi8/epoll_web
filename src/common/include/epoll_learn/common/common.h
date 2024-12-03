@@ -9,3 +9,5 @@
 #   define EPOLL_LEARN_EXTERN_C_END
 #endif
 // clang-format on
+
+void epoll_learn_no_use(void);
