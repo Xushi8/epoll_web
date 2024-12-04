@@ -35,6 +35,8 @@ endif()
 
 option(EPOLL_WEB_INSTALL_STATIC_LIB "Install static lib" OFF)
 
+option(EPOLL_WEB_STATIC_LIBSTDCXX "Link static libstdc++" ON)
+
 if(NOT WIN32)
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
