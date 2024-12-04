@@ -1,4 +1,5 @@
 #include <epoll_web/network/server1.h>
+#include <epoll_web/common/get_hardware_concurrency.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -113,7 +114,7 @@ void server3(void)
     args.epfd = epfd;
     args.lfd = lfd;
 
-    const int thread_num = 16;
+    const int thread_num = get_hardware_concurrency();
     thrd_t threads[thread_num];
     for (int i = 0; i < thread_num; i++)
     {
