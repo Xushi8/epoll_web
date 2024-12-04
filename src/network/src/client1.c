@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -96,7 +97,12 @@ void client1(void)
             perror("read");
             break;
         }
-        sleep(1); // 每隔1s发送一条数据
+
+        struct timespec sleep_time;
+        sleep_time.tv_sec = 0;
+        sleep_time.tv_nsec = 100'000'000;
+        (void)sleep_time;
+        nanosleep(&sleep_time, nullptr);
     }
 
     close(fd);
