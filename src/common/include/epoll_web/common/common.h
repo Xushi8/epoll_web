@@ -28,4 +28,9 @@
 #endif
 // clang-format on
 
+EPOLL_WEB_EXTERN_C_BEGIN
+
+EPOLL_WEB_EXPORT
 void epoll_web_no_use(void);
+
+EPOLL_WEB_EXTERN_C_END
