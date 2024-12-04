@@ -25,7 +25,7 @@ void server1(void)
         exit(0);
     }
 
-    ret = listen(lfd, 128);
+    ret = listen(lfd, SOMAXCONN);
     if (ret == -1)
     {
         perror("listen");
