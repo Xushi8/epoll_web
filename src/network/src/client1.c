@@ -77,7 +77,7 @@ void client1(void)
     {
         // 发送数据
         char buf[1024];
-        sprintf(buf, "你好, 服务器...%d\n", number++);
+        sprintf(buf, "你好, 服务器...%d", number++);
         write(fd, buf, strlen(buf) + 1);
 
         // 接收数据
