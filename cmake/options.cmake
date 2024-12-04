@@ -42,8 +42,6 @@ if(NOT WIN32)
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-
 option(EPOLL_WEB_ENABLE_SSE4 "Enable sse4.1 sse4.2" OFF)
 option(EPOLL_WEB_ENABLE_AVX "Enable avx" OFF)
 option(EPOLL_WEB_ENABLE_AVX2 "Enable avx2 fma" OFF)
