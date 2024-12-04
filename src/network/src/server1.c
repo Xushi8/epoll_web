@@ -11,7 +11,7 @@ void server1(void)
     if (lfd == -1)
     {
         perror("socket");
-        exit(0);
+        exit(1);
     }
 
     struct sockaddr_in6 addr = {};
@@ -22,14 +22,14 @@ void server1(void)
     if (ret == -1)
     {
         perror("bind");
-        exit(0);
+        exit(1);
     }
 
     ret = listen(lfd, SOMAXCONN);
     if (ret == -1)
     {
         perror("listen");
-        exit(0);
+        exit(1);
     }
 
     // 4. 阻塞等待并接受客户端连接
@@ -39,7 +39,7 @@ void server1(void)
     if (cfd == -1)
     {
         perror("accept");
-        exit(0);
+        exit(1);
     }
     // 打印客户端的地址信息
     char ip[24] = {0};

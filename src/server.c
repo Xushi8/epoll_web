@@ -1,4 +1,6 @@
 #include <epoll_web/network/server1.h>
+#include <epoll_web/network/server2.h>
+#include <epoll_web/network/server3.h>
 
 #include <locale.h>
 #ifdef _WIN32
@@ -18,5 +20,7 @@ int main(void)
     setlocale(LC_ALL, "C.UTF-8");
 #endif
 
-    server1();
+    // server1();
+    // server2();
+    server3();
 }
