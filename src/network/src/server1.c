@@ -7,7 +7,6 @@
 
 void server1(void)
 {
-    // 1. 创建监听的套接字
     int lfd = socket(AF_INET6, SOCK_STREAM, 0);
     if (lfd == -1)
     {
@@ -15,13 +14,9 @@ void server1(void)
         exit(0);
     }
 
-    // 2. 将socket()返回值和本地的IP端口绑定到一起
-    struct sockaddr_in6 addr;
+    struct sockaddr_in6 addr = {};
     addr.sin6_family = AF_INET6;
-    addr.sin6_port = htons(10000); // 大端端口
-    // INADDR_ANY代表本机的所有IP, 假设有三个网卡就有三个IP地址
-    // 这个宏可以代表任意一个IP地址
-    // 这个宏一般用于本地的绑定操作
+    addr.sin6_port = htons(10000);
     addr.sin6_addr = in6addr_any;
     int ret = bind(lfd, (struct sockaddr*)&addr, sizeof(addr));
     if (ret == -1)
@@ -30,7 +25,6 @@ void server1(void)
         exit(0);
     }
 
-    // 3. 设置监听
     ret = listen(lfd, 128);
     if (ret == -1)
     {
