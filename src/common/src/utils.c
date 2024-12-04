@@ -1,4 +1,4 @@
-#include <epoll_web/common/get_hardware_concurrency.h>
+#include <epoll_web/common/utils.h>
 #include <unistd.h>
 #include <pthread.h>
 

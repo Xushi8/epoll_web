@@ -1,5 +1,5 @@
 #include <epoll_web/network/server1.h>
-#include <epoll_web/common/get_hardware_concurrency.h>
+#include <epoll_web/common/utils.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
