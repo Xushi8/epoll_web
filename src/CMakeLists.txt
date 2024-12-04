@@ -11,8 +11,8 @@ foreach(name ${EPOLL_WEB_TARGETS})
     target_link_libraries(${name}
     PUBLIC
         # src
-        epoll_learn_common
-        epoll_learn_network
+        epoll_web_common
+        epoll_web_network
 
         # package
         Threads::Threads
