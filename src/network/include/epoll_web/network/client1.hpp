@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <thread>
 #include <unistd.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -42,14 +43,14 @@ inline void client1()
         if (p->ai_family == AF_INET6)
         {
             char addr_str[INET6_ADDRSTRLEN];
-            struct sockaddr_in6* ipv6 = (struct sockaddr_in6*)p->ai_addr;
+            struct sockaddr_in6* ipv6 = reinterpret_cast<struct sockaddr_in6*>(p->ai_addr);
             inet_ntop(AF_INET6, &(ipv6->sin6_addr), addr_str, sizeof(addr_str));
             printf("IPv6 address: %s\n", addr_str);
         }
         else
         {
             char addr_str[INET_ADDRSTRLEN];
-            struct sockaddr_in* ipv4 = (struct sockaddr_in*)p->ai_addr;
+            struct sockaddr_in* ipv4 = reinterpret_cast<struct sockaddr_in*>(p->ai_addr);
             inet_ntop(AF_INET, &(ipv4->sin_addr), addr_str, sizeof(addr_str));
             printf("IPv4 address: %s\n", addr_str);
         }
@@ -103,11 +104,8 @@ inline void client1()
             break;
         }
 
-        struct timespec sleep_time;
-        sleep_time.tv_sec = 0;
-        sleep_time.tv_nsec = 100'000'000;
-        (void)sleep_time;
-        nanosleep(&sleep_time, nullptr);
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(1s);
     }
 
     close(fd);

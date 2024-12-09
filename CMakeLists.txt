@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(epoll_web LANGUAGES C CXX VERSION 0.0.0)
 
-set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
 

@@ -16,11 +16,11 @@ inline void server2()
     int opt = 1;
     setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
-    struct sockaddr_in6 addr = {};
+    sockaddr_in6 addr = {};
     addr.sin6_family = AF_INET6;
     addr.sin6_port = htons(10000);
     addr.sin6_addr = in6addr_any;
-    int ret = bind(lfd, (struct sockaddr*)&addr, sizeof(addr));
+    int ret = bind(lfd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
     if (ret == -1)
     {
         perror("bind");
@@ -42,9 +42,10 @@ inline void server2()
         exit(1);
     }
 
-    struct epoll_event ev;
-    ev.events = EPOLLIN;
-    ev.data.fd = lfd;
+    struct epoll_event ev
+    {
+        .events = EPOLLIN, .data { .fd = lfd }
+    };
 
     ret = epoll_ctl(epfd, EPOLL_CTL_ADD, lfd, &ev);
     if (ret == -1)

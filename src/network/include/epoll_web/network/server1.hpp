@@ -23,7 +23,7 @@ inline void server1()
     addr.sin6_family = AF_INET6;
     addr.sin6_port = htons(10000);
     addr.sin6_addr = in6addr_any;
-    int ret = bind(lfd, (struct sockaddr*)&addr, sizeof(addr));
+    int ret = bind(lfd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
     if (ret == -1)
     {
         perror("bind");
@@ -38,9 +38,9 @@ inline void server1()
     }
 
     // 4. 阻塞等待并接受客户端连接
-    struct sockaddr_in cliaddr;
+    sockaddr_in cliaddr{};
     unsigned int clilen = sizeof(cliaddr);
-    int cfd = accept(lfd, (struct sockaddr*)&cliaddr, &clilen);
+    int cfd = accept(lfd, reinterpret_cast<sockaddr*>(&cliaddr), &clilen);
     if (cfd == -1)
     {
         perror("accept");
