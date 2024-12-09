@@ -17,9 +17,22 @@ foreach(name ${EPOLL_WEB_TARGETS})
 
         # package
         Threads::Threads
+        mimalloc
+        Boost::headers
+
+        
+        RE2::re2
 
         # external
     )
+
+    if(EPOLL_WEB_ENABLE_TEST)
+        target_link_libraries(${name}
+        PUBLIC
+            benchmark::benchmark
+            GTest::Gtest
+        )
+    endif()
 
 endforeach(name ${EPOLL_WEB_TARGETS})
 

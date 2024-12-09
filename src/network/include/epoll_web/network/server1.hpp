@@ -7,8 +7,11 @@
 #include <unistd.h>
 #include <cstring>
 #include <arpa/inet.h>
+#include <boost/endian.hpp>
 
 EPOLL_WEB_BEGIN_NAMESPACE
+
+namespace endian = boost::endian;
 
 inline void server1()
 {
@@ -19,10 +22,7 @@ inline void server1()
         exit(1);
     }
 
-    struct sockaddr_in6 addr = {};
-    addr.sin6_family = AF_INET6;
-    addr.sin6_port = htons(10000);
-    addr.sin6_addr = in6addr_any;
+    sockaddr_in6 addr = {.sin6_family = AF_INET6, .sin6_port = endian::native_to_big(static_cast<uint16_t>(10000)), .sin6_flowinfo = {}, .sin6_addr = in6addr_any, .sin6_scope_id = {}};
     int ret = bind(lfd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
     if (ret == -1)
     {
@@ -38,7 +38,7 @@ inline void server1()
     }
 
     // 4. 阻塞等待并接受客户端连接
-    sockaddr_in cliaddr{};
+    sockaddr_in cliaddr; // NOLINT(cppcoreguidelines-pro-type-member-init)
     unsigned int clilen = sizeof(cliaddr);
     int cfd = accept(lfd, reinterpret_cast<sockaddr*>(&cliaddr), &clilen);
     if (cfd == -1)

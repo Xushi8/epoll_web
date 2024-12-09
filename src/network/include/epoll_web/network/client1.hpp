@@ -37,7 +37,7 @@ inline void client1()
 
     // 处理返回的 IPv6 地址
     struct addrinfo* p;
-    for (p = res; p != NULL; p = p->ai_next)
+    for (p = res; p != nullptr; p = p->ai_next)
     {
         // 只会遍历 IPv6 地址
         if (p->ai_family == AF_INET6)

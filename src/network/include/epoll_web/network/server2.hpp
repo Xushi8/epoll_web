@@ -7,8 +7,13 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/epoll.h>
+#include <boost/endian.hpp>
+#include <array>
+
 
 EPOLL_WEB_BEGIN_NAMESPACE
+
+namespace endian = boost::endian;
 
 inline void server2()
 {
@@ -16,10 +21,7 @@ inline void server2()
     int opt = 1;
     setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
-    sockaddr_in6 addr = {};
-    addr.sin6_family = AF_INET6;
-    addr.sin6_port = htons(10000);
-    addr.sin6_addr = in6addr_any;
+    sockaddr_in6 addr = {.sin6_family = AF_INET6, .sin6_port = endian::native_to_big(static_cast<uint16_t>(10000)), .sin6_flowinfo = {}, .sin6_addr = in6addr_any, .sin6_scope_id = {}};
     int ret = bind(lfd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
     if (ret == -1)
     {
@@ -54,12 +56,12 @@ inline void server2()
         exit(1);
     }
 
-    const size_t maxx = 1024;
-    struct epoll_event evs[maxx];
+    constexpr size_t maxx = 1024;
+    std::array<struct epoll_event, maxx> evs; // NOLINT(cppcoreguidelines-pro-type-member-init)
 
     while (1)
     {
-        int cnt = epoll_wait(epfd, evs, maxx, -1);
+        int cnt = epoll_wait(epfd, evs.data(), maxx, -1);
         for (int i = 0; i < cnt; i++)
         {
             int curfd = evs[i].data.fd;
