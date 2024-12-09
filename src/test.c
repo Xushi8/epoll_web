@@ -1,19 +1,18 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <stdint.h>
 int main()
 {
-    int p1, p2;
-    while ((p1 = fork()) == -1)
-        ;
-    if (p1 == 0)
-        putchar('b');
-    else
+    int cnt = 1;
+
+    int pid;
+    for (; (pid = fork() && pid != 0);)
     {
-        while ((p2 = fork()) == -1)
-            ;
-        if (p2 == 0)
-            putchar('c');
-        else
-            putchar('a');
+        printf("%d\n", cnt);
+        if (pid == -1)
+        {
+            break;
+        }
+        cnt++;
     }
 }
