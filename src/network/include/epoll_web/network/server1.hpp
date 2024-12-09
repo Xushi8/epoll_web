@@ -1,11 +1,16 @@
-#include <epoll_web/network/server1.h>
-#include <stdio.h>
-#include <stdlib.h>
+#pragma once
+
+#include <epoll_web/common/common.hpp>
+
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
-#include <string.h>
+#include <cstring>
 #include <arpa/inet.h>
 
-void server1(void)
+BASIC_PROJECT_BEGIN_NAMESPACE
+
+void server1()
 {
     int lfd = socket(AF_INET6, SOCK_STREAM, 0);
     if (lfd == -1)
@@ -79,3 +84,5 @@ void server1(void)
     close(cfd);
     close(lfd);
 }
+
+BASIC_PROJECT_END_NAMESPACE

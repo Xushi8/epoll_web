@@ -1,11 +1,16 @@
-#include <epoll_web/network/server1.h>
-#include <stdio.h>
-#include <stdlib.h>
+#pragma once
+
+#include <epoll_web/common/common.hpp>
+
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/epoll.h>
 
-void server2(void)
+BASIC_PROJECT_BEGIN_NAMESPACE
+
+void server2()
 {
     int lfd = socket(AF_INET6, SOCK_STREAM, 0);
     int opt = 1;
@@ -28,7 +33,6 @@ void server2(void)
         perror("listen");
         exit(1);
     }
-
 
     // epoll
     int epfd = epoll_create1(0);
@@ -94,3 +98,5 @@ void server2(void)
         }
     }
 }
+
+BASIC_PROJECT_END_NAMESPACE

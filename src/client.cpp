@@ -1,13 +1,11 @@
-#include <epoll_web/network/server1.h>
-#include <epoll_web/network/server2.h>
-#include <epoll_web/network/server3.h>
+#include <epoll_web/network/client1.hpp>
 
-#include <locale.h>
+#include <clocale>
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
-int main(void)
+int main()
 {
 #ifdef _WIN32
     // -finput-charset=utf-8 -fexec-charset=utf-8
@@ -20,7 +18,5 @@ int main(void)
     setlocale(LC_ALL, "C.UTF-8");
 #endif
 
-    // server1();
-    // server2();
-    server3();
+    basic_namespace::client1();
 }

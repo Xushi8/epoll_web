@@ -1,8 +1,11 @@
-#include <epoll_web/network/client1.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#pragma once
+
+#include <epoll_web/common/common.hpp>
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <unistd.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -10,7 +13,9 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-void client1(void)
+BASIC_PROJECT_BEGIN_NAMESPACE
+
+inline void client1()
 {
     // 1. 获取服务器地址信息
     struct addrinfo hints = {};
@@ -107,3 +112,5 @@ void client1(void)
 
     close(fd);
 }
+
+BASIC_PROJECT_END_NAMESPACE

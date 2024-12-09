@@ -8,7 +8,7 @@ set(EPOLL_WEB_TARGETS
 )
 
 foreach(name ${EPOLL_WEB_TARGETS})
-    add_executable(${name} ${name}.c)
+    add_executable(${name} ${name}.cpp)
     target_link_libraries(${name}
     PUBLIC
         # src
