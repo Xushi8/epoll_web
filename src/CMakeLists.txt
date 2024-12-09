@@ -4,6 +4,7 @@ add_subdirectory(network)
 set(EPOLL_WEB_TARGETS
     server
     client
+    test
 )
 
 foreach(name ${EPOLL_WEB_TARGETS})
