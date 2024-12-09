@@ -84,7 +84,7 @@ inline void client1()
         // 发送数据
         char buf[1024];
         sprintf(buf, "你好, 服务器...%d", number++);
-        write(fd, buf, strlen(buf) + 1);
+        std::ignore = write(fd, buf, strlen(buf) + 1);
 
         // 接收数据
         memset(buf, 0, sizeof(buf));
