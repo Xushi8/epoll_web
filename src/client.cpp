@@ -1,4 +1,5 @@
 #include <epoll_web/network/client1.hpp>
+#include <epoll_web/common/log.hpp>
 
 #include <clocale>
 #ifdef _WIN32
@@ -17,6 +18,8 @@ int main()
 #elif defined __linux__
     setlocale(LC_ALL, "C.UTF-8");
 #endif
+
+    epoll_web::set_default_log({.log_name = "epoll_web", .with_time = true});
 
     epoll_web::client1();
 }
