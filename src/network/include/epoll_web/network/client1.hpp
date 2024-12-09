@@ -13,7 +13,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-BASIC_PROJECT_BEGIN_NAMESPACE
+EPOLL_WEB_BEGIN_NAMESPACE
 
 inline void client1()
 {
@@ -113,4 +113,4 @@ inline void client1()
     close(fd);
 }
 
-BASIC_PROJECT_END_NAMESPACE
+EPOLL_WEB_END_NAMESPACE

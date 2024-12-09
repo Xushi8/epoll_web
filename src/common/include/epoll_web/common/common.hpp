@@ -2,24 +2,14 @@
 
 // clang-format off
 
-#ifndef BASIC_PROJECT_UNROLL_LOOP
-#	if defined(_MSC_VER) && !defined(__clang__)
-#		define BASIC_PROJECT_UNROLL_LOOP(N) __pragma(loop(unroll, N))
-#	else
-#		define BASIC_PROJECT_STRINGIFY(X)	 #X
-#		define BASIC_PROJECT_TOSTRING(X)	 BASIC_PROJECT_STRINGIFY(X)
-#		define BASIC_PROJECT_UNROLL_LOOP(N) _Pragma(BASIC_PROJECT_TOSTRING(GCC unroll N))
-#	endif
-#endif
-
-#ifndef BASIC_PROJECT_BEGIN_NAMESPACE
-#define BASIC_PROJECT_BEGIN_NAMESPACE \
-	namespace basic_namespace \
+#ifndef EPOLL_WEB_BEGIN_NAMESPACE
+#define EPOLL_WEB_BEGIN_NAMESPACE \
+	namespace epoll_web \
 	{                         \
 	inline namespace v0       \
 	{
 
-#define BASIC_PROJECT_END_NAMESPACE   \
+#define EPOLL_WEB_END_NAMESPACE   \
 	}                         \
 	}
 #endif

@@ -8,9 +8,9 @@
 #include <cstring>
 #include <arpa/inet.h>
 
-BASIC_PROJECT_BEGIN_NAMESPACE
+EPOLL_WEB_BEGIN_NAMESPACE
 
-void server1()
+inline void server1()
 {
     int lfd = socket(AF_INET6, SOCK_STREAM, 0);
     if (lfd == -1)
@@ -85,4 +85,4 @@ void server1()
     close(lfd);
 }
 
-BASIC_PROJECT_END_NAMESPACE
+EPOLL_WEB_END_NAMESPACE
