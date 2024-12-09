@@ -23,6 +23,8 @@ if(EPOLL_WEB_STATIC_EXTERNAL_LIB)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".a")
 endif()
 
+option(EPOLL_WEB_ENABLE_TEST "Enable google test" OFF)
+
 if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS OFF)
 endif()

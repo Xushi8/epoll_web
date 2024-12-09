@@ -12,6 +12,9 @@ if(WIN32)
     add_definitions(-D_UNICODE)
 endif()
 
+add_definitions(-DFMT_HEADER_ONLY)
+add_definitions(-DSPDLOG_FMT_EXTERNAL)
+
 if(WIN32)
     add_definitions(-DNOMINMAX)
     add_definitions(-D_USE_MATH_DEFINES)

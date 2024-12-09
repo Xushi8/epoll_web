@@ -44,8 +44,20 @@ add_link_options(-Werror)
 add_compile_options(-fopenmp)
 add_link_options(-fopenmp)
 
+# add_compile_options(-fno-rtti)
+# add_link_options(-fno-rtti)
+
 # add_compile_options(-fno-semantic-interposition)
 # add_link_options(-fno-semantic-interposition)
+
+# add_compile_options(-ffast-math)
+# add_link_options(-ffast-math)
+
+# PGO
+# add_compile_options(-fprofile-generate=pgo_files)
+# add_link_options(-fprofile-generate=pgo_files)
+# add_compile_options(-fprofile-use=pgo_files)
+# add_link_options(-fprofile-use=pgo_files)
 
 if(EPOLL_WEB_ENABLE_ADDRESS_SANITIZER)
     add_compile_options(-fsanitize=address)
@@ -76,6 +88,10 @@ if(EPOLL_WEB_ENABLE_MOLD)
     add_link_options(-fuse-ld=mold)
 endif()
 
+if(EPOLL_WEB_STATIC_LIBSTDCXX)
+    add_link_options(-static-libstdc++)
+endif()
+
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-fgraphite-identity -fdevirtualize-at-ltrans -fipa-pta -fuse-linker-plugin)
@@ -83,13 +99,19 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # add_compile_options(-floop-nest-optimize)
     # add_link_options(-floop-nest-optimize)
 
-    add_compile_options(
-        $<$<COMPILE_LANGUAGE:CXX>:-fconstexpr-ops-limit=1000000000>
-        $<$<COMPILE_LANGUAGE:CXX>:-fconstexpr-loop-limit=100000000>
-    )
+    add_compile_options(-fconstexpr-ops-limit=1000000000 -fconstexpr-loop-limit=100000000)
+    add_link_options(-fconstexpr-ops-limit=1000000000 -fconstexpr-loop-limit=100000000)
+
+    # for fmt 11.0.2
+    add_compile_options(-Wno-stringop-overflow)
+    add_link_options(-Wno-stringop-overflow)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(-fcolor-diagnostics)
     add_link_options(-fcolor-diagnostics)
+
+    # for fmt 11.0.2
+    add_compile_options(-Wno-shift-overflow)
+    add_link_options(-Wno-shift-overflow)
 endif()
