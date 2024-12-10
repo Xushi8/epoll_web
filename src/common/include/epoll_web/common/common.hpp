@@ -4,13 +4,13 @@
 
 #ifndef EPOLL_WEB_BEGIN_NAMESPACE
 #define EPOLL_WEB_BEGIN_NAMESPACE \
-	namespace epoll_web \
-	{                         \
-	inline namespace v0       \
+	namespace epoll_web           \
+	{                             \
+	inline namespace v0           \
 	{
 
 #define EPOLL_WEB_END_NAMESPACE   \
-	}                         \
+	}                             \
 	}
 #endif
 
