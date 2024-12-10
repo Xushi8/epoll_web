@@ -14,17 +14,17 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        cxx: [gcc-14, clang-18]
+        cxx: [g++-14, clang++-18]
         build_type: [Debug, Release]
         sanitizer: [address, others]
         include:
-          - cxx: gcc-14
+          - cxx: g++-14
             install: |
-              sudo apt install gcc-14
+              sudo apt install g++-14
               sudo apt install libomp-18-dev mold ninja-build libmimalloc-dev libboost1.83-dev libbenchmark-dev libgtest-dev libre2-dev
-          - cxx: clang-18
+          - cxx: clang++-18
             install: |
-              sudo apt install clang-18
+              sudo apt install clang++-18
               sudo apt install libomp-18-dev libc++-18-dev mold ninja-build libmimalloc-dev libboost1.83-dev libbenchmark-dev libgtest-dev libre2-dev
 
     steps:
