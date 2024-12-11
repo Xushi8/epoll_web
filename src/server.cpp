@@ -19,7 +19,7 @@ int main()
 #elif defined __linux__
     setlocale(LC_ALL, "C.UTF-8");
 #endif
-    
+
     epoll_web::set_default_log({.log_name = "epoll_web", .with_time = true});
 
     // server1();

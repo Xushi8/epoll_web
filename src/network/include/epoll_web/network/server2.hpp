@@ -10,7 +10,6 @@
 #include <boost/endian.hpp>
 #include <array>
 
-
 EPOLL_WEB_BEGIN_NAMESPACE
 
 namespace endian = boost::endian;
@@ -44,10 +43,8 @@ inline void server2()
         exit(1);
     }
 
-    struct epoll_event ev
-    {
-        .events = EPOLLIN, .data { .fd = lfd }
-    };
+    struct epoll_event ev{
+        .events = EPOLLIN, .data{.fd = lfd}};
 
     ret = epoll_ctl(epfd, EPOLL_CTL_ADD, lfd, &ev);
     if (ret == -1)
