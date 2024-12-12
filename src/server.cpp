@@ -1,6 +1,7 @@
 #include <epoll_web/common/log.hpp>
 #include <epoll_web/network/server1.hpp>
 #include <epoll_web/network/server2.hpp>
+#include <epoll_web/common/string_convert.hpp>
 
 #include <clocale>
 #ifdef _WIN32
@@ -19,7 +20,7 @@ int main(int argc, char** argv)
 #elif defined __linux__
     setlocale(LC_ALL, "C.UTF-8");
 #endif
-    
+
     epoll_web::set_default_log({.log_name = "epoll_web", .with_time = true});
 
     if (argc != 2)
@@ -28,8 +29,13 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    uint16_t port = atoi(argv[1]); // NOLINT(cert-err34-c)
+    std::optional<uint16_t> port = epoll_web::from_string<uint16_t>(argv[1]);
+    if (!port.has_value()) [[unlikely]]
+    {
+        fmt::print(stderr, "Invalid port\n");
+        exit(1);
+    }
 
-    epoll_web::server1(port);
-    // epoll_web::server2(port);
+    epoll_web::server1(*port);
+    // epoll_web::server2(*port);
 }
