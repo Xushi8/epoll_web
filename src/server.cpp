@@ -20,13 +20,13 @@ int main(int argc, char** argv)
     setlocale(LC_ALL, "C.UTF-8");
 #endif
 
-    epoll_web::set_default_log({.log_name = "epoll_web", .with_time = true});
-
     if (argc != 2)
     {
         fmt::print(stderr, "Usage: {} <port>\n", argv[0]);
         exit(1);
     }
+
+    epoll_web::set_default_log({.log_name = "epoll_web", .with_time = true});
 
     uint16_t port = atoi(argv[1]); // NOLINT(cert-err34-c)
 
