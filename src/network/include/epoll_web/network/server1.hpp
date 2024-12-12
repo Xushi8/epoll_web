@@ -16,11 +16,8 @@ namespace endian = boost::endian;
 inline void server1()
 {
     int lfd = socket(AF_INET6, SOCK_STREAM, 0);
-    if (lfd == -1)
-    {
-        perror("socket");
-        exit(1);
-    }
+    int opt = 1;
+    setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
     sockaddr_in6 addr = {.sin6_family = AF_INET6, .sin6_port = endian::native_to_big(static_cast<uint16_t>(10000)), .sin6_flowinfo = {}, .sin6_addr = in6addr_any, .sin6_scope_id = {}};
     int ret = bind(lfd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
