@@ -20,7 +20,7 @@ inline void server1()
     setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
     sockaddr_in6 addr = {.sin6_family = AF_INET6, .sin6_port = endian::native_to_big(static_cast<uint16_t>(10000)), .sin6_flowinfo = {}, .sin6_addr = in6addr_any, .sin6_scope_id = {}};
-    int ret = bind(lfd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
+    int ret = bind(lfd, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr));
     if (ret == -1)
     {
         perror("bind");
