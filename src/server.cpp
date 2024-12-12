@@ -22,6 +22,6 @@ int main()
 
     epoll_web::set_default_log({.log_name = "epoll_web", .with_time = true});
 
-    // server1();
-    epoll_web::server2();
+    epoll_web::server1();
+    // epoll_web::server2();
 }
