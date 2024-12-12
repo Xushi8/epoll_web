@@ -16,7 +16,7 @@
 
 EPOLL_WEB_BEGIN_NAMESPACE
 
-inline void client1(std::string addr, std::string port) // NOLINT(performance-unnecessary-value-param)
+inline void client1(std::string_view addr, std::string_view port)
 {
     // 1. 获取服务器地址信息
     struct addrinfo hints = {};
@@ -28,7 +28,7 @@ inline void client1(std::string addr, std::string port) // NOLINT(performance-un
 
     // 使用 getaddrinfo 获取服务器的地址信息
     struct addrinfo* res;
-    check_error = getaddrinfo(addr.c_str(), port.c_str(), &hints, &res);
+    check_error = getaddrinfo(addr.data(), port.data(), &hints, &res); // NOLINT(bugprone-suspicious-stringview-data-usage)
     if (check_error != 0)
     {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(check_error));

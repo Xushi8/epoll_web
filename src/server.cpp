@@ -28,7 +28,7 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    uint16_t port = atoi(argv[1]);
+    uint16_t port = atoi(argv[1]); // NOLINT(cert-err34-c)
 
     epoll_web::server1(port);
     // epoll_web::server2(port);
