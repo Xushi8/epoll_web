@@ -16,7 +16,7 @@
 
 EPOLL_WEB_BEGIN_NAMESPACE
 
-inline void client1()
+inline void client1(std::string addr, std::string port) // NOLINT(performance-unnecessary-value-param)
 {
     // 1. 获取服务器地址信息
     struct addrinfo hints = {};
@@ -28,7 +28,7 @@ inline void client1()
 
     // 使用 getaddrinfo 获取服务器的地址信息
     struct addrinfo* res;
-    check_error = getaddrinfo("localhost", "10000", &hints, &res);
+    check_error = getaddrinfo(addr.c_str(), port.c_str(), &hints, &res);
     if (check_error != 0)
     {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(check_error));
@@ -39,7 +39,6 @@ inline void client1()
     struct addrinfo* p;
     for (p = res; p != nullptr; p = p->ai_next)
     {
-        // 只会遍历 IPv6 地址
         if (p->ai_family == AF_INET6)
         {
             char addr_str[INET6_ADDRSTRLEN];

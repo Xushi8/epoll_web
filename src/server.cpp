@@ -7,7 +7,7 @@
 #include <windows.h>
 #endif
 
-int main()
+int main(int argc, char** argv)
 {
 #ifdef _WIN32
     // -finput-charset=utf-8 -fexec-charset=utf-8
@@ -22,6 +22,14 @@ int main()
 
     epoll_web::set_default_log({.log_name = "epoll_web", .with_time = true});
 
-    epoll_web::server1();
-    // epoll_web::server2();
+    if (argc != 2)
+    {
+        fmt::print(stderr, "Usage: {} <port>\n", argv[0]);
+        exit(1);
+    }
+
+    uint16_t port = atoi(argv[1]);
+
+    epoll_web::server1(port);
+    // epoll_web::server2(port);
 }

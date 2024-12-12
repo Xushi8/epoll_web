@@ -6,7 +6,7 @@
 #include <windows.h>
 #endif
 
-int main()
+int main(int argc, char** argv)
 {
 #ifdef _WIN32
     // -finput-charset=utf-8 -fexec-charset=utf-8
@@ -19,7 +19,13 @@ int main()
     setlocale(LC_ALL, "C.UTF-8");
 #endif
 
+    if (argc != 3)
+    {
+        fmt::print(stderr, "Usage: {} <ip/domain> <port>\n", argv[0]);
+        exit(1);
+    }
+
     epoll_web::set_default_log({.log_name = "epoll_web", .with_time = true});
 
-    epoll_web::client1();
+    epoll_web::client1(argv[1], argv[2]);
 }
