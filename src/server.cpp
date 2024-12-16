@@ -1,6 +1,7 @@
 #include <epoll_web/common/log.hpp>
 #include <epoll_web/network/server1.hpp>
 #include <epoll_web/network/server2.hpp>
+#include <epoll_web/network/server3.hpp>
 #include <epoll_web/common/string_convert.hpp>
 
 #include <clocale>
@@ -21,7 +22,7 @@ int main(int argc, char** argv)
     setlocale(LC_ALL, "C.UTF-8");
 #endif
 
-    epoll_web::set_default_log({.log_name = "epoll_web", .with_time = true});
+    epoll_web::set_default_log({.level = spdlog::level::trace, .log_name = "epoll_web", .with_time = true});
 
     if (argc != 2)
     {
@@ -36,6 +37,7 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    epoll_web::server1(*port);
+    // epoll_web::server1(*port);
     // epoll_web::server2(*port);
+    epoll_web::server3(*port);
 }
