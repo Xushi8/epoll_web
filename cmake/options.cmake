@@ -11,9 +11,9 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-option(EPOLL_WEB_ENABLE_STRICT_STL_CHECKS "Enable strict debugging and runtime checks" OFF)
+option(EPOLL_WEB_STRICT_STL_CHECKS "Enable strict debugging and runtime checks" OFF)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(EPOLL_WEB_ENABLE_STRICT_STL_CHECKS ON)
+    set(EPOLL_WEB_STRICT_STL_CHECKS ON)
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -23,7 +23,7 @@ if(EPOLL_WEB_STATIC_EXTERNAL_LIB)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".a")
 endif()
 
-option(EPOLL_WEB_ENABLE_TEST "Enable google test" OFF)
+option(EPOLL_WEB_TEST "Enable google test" OFF)
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS OFF)
@@ -44,17 +44,17 @@ if(NOT WIN32)
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
-option(EPOLL_WEB_ENABLE_SSE4 "Enable sse4.1 sse4.2" OFF)
-option(EPOLL_WEB_ENABLE_AVX "Enable avx" OFF)
-option(EPOLL_WEB_ENABLE_AVX2 "Enable avx2 fma" OFF)
+option(EPOLL_WEB_SSE4 "Enable sse4.1 sse4.2" OFF)
+option(EPOLL_WEB_AVX "Enable avx" OFF)
+option(EPOLL_WEB_AVX2 "Enable avx2 fma" OFF)
 option(EPOLL_WEB_NATIVE_ARCH "-march=native" OFF)
 
-option(EPOLL_WEB_ENABLE_MOLD "Enable mold linker" OFF)
+option(EPOLL_WEB_MOLD "Enable mold linker" OFF)
 
-option(EPOLL_WEB_ENABLE_ADDRESS_SANITIZER "-fsanitize=address" OFF)
-option(EPOLL_WEB_ENABLE_UNDEFINED_SANITIZER "-fsanitize=undefined" OFF)
-option(EPOLL_WEB_ENABLE_THREAD_SANITIZER "-fsanitize=thread" OFF)
-option(EPOLL_WEB_ENABLE_MEMORY_SANITIZER "-fsanitize=memory" OFF)
+option(EPOLL_WEB_ADDRESS_SANITIZER "-fsanitize=address" OFF)
+option(EPOLL_WEB_UNDEFINED_SANITIZER "-fsanitize=undefined" OFF)
+option(EPOLL_WEB_THREAD_SANITIZER "-fsanitize=thread" OFF)
+option(EPOLL_WEB_MEMORY_SANITIZER "-fsanitize=memory" OFF)
 
 # lto
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)

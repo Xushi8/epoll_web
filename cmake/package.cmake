@@ -13,7 +13,7 @@ find_package(RE2 REQUIRED)
 # dynamic link begin
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".dll" ".so")
 
-if(EPOLL_WEB_ENABLE_TEST)
+if(EPOLL_WEB_TEST)
     find_package(benchmark REQUIRED)
     find_package(GTest REQUIRED)
 endif()

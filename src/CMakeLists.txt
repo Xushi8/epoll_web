@@ -26,7 +26,7 @@ foreach(name ${EPOLL_WEB_TARGETS})
         # external
     )
 
-    if(EPOLL_WEB_ENABLE_TEST)
+    if(EPOLL_WEB_TEST)
         target_link_libraries(${name}
         PUBLIC
             benchmark::benchmark

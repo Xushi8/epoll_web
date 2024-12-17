@@ -1,4 +1,4 @@
-if(EPOLL_WEB_ENABLE_STRICT_STL_CHECKS)
+if(EPOLL_WEB_STRICT_STL_CHECKS)
     add_definitions(-D_GLIBCXX_DEBUG)
     add_definitions(-D_GLIBCXX_DEBUG_PEDANTIC)
     add_definitions(-D_FORTIFY_SOURCE=2)
