@@ -1,4 +1,4 @@
-name: Build, Upload, and Download Artifacts
+name: Build and Test Workflow
 
 on:
   push:
@@ -36,27 +36,46 @@ jobs:
         sudo apt update
         ${{ matrix.install }}
 
-    - name: Build project
+    - name: Configure
+      env:
+        CXX: ${{matrix.cxx}}
+        CC: ${{ matrix.cxx == 'g++-14' && 'gcc-14' || 'clang-19' }}
       run: |
-        mkdir -p build
-        tar -czf build/my_artifact.tar.gz my_project_folder/
+        cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
+              -Bbuild \
+              -GNinja \
+              -DEPOLL_WEB_ENABLE_STRICT_STL_CHECKS=ON \
+              -DEPOLL_WEB_ENABLE_ADDRESS_SANITIZER=${{ matrix.sanitizer == 'address' && 'ON' || 'OFF' }} \
+              -DEPOLL_WEB_ENABLE_UNDEFINED_SANITIZER=${{ matrix.sanitizer == 'others' && 'ON' || 'OFF' }} \
+              -DEPOLL_WEB_ENABLE_THREAD_SANITIZER=${{ matrix.sanitizer == 'others' && 'ON' || 'OFF' }} \
+              -DEPOLL_WEB_ENABLE_MOLD=ON \
+              -DEPOLL_WEB_ENABLE_AVX2=ON \
+              $GITHUB_WORKSPACE
 
-    - name: Upload artifact
+    - name: Build
+      run: |
+        cmake --build build --config ${{matrix.build_type}} --parallel
+
+    - name: Upload build directory as artifact
       uses: actions/upload-artifact@v3
       with:
-        name: my-artifact
-        path: build/my_artifact.tar.gz
+        name: build-artifacts
+        path: build/  # 上传整个 build 目录
 
   download:
     runs-on: ubuntu-24.04
-    needs: build  # Ensure the build job completes before downloading
+    needs: build  # 需要等待 build 完成后才会执行
     steps:
     - name: Download artifact
       uses: actions/download-artifact@v3
       with:
-        name: my-artifact
-        path: ./downloaded  # Path to store the downloaded artifact
+        name: build-artifacts
+        path: ./downloaded  # 下载到指定路径
 
-    - name: Extract the downloaded artifact
+    - name: Extract and use the artifact
       run: |
-        tar -xvzf ./downloaded/my_artifact.tar.gz -C ./downloaded
+        # 假设你下载了整个 build 目录
+        # 比如，my_project_binary 会在 build 目录下
+        mv ./downloaded/build/my_project_binary ./my_project_binary
+        # 可以在这里验证下载的构建产物
+        ./my_project_binary --help
