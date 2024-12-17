@@ -1,4 +1,4 @@
-name: Build and Test Workflow
+name: Build, Upload, and Download Artifacts
 
 on:
   push:
@@ -36,22 +36,27 @@ jobs:
         sudo apt update
         ${{ matrix.install }}
 
-    - name: Configure
-      env:
-        CXX: ${{matrix.cxx}}
-        CC: ${{ matrix.cxx == 'g++-14' && 'gcc-14' || 'clang-19' }}
+    - name: Build project
       run: |
-        cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
-              -Bbuild \
-              -GNinja \
-              -DEPOLL_WEB_ENABLE_STRICT_STL_CHECKS=ON \
-              -DEPOLL_WEB_ENABLE_ADDRESS_SANITIZER=${{ matrix.sanitizer == 'address' && 'ON' || 'OFF' }} \
-              -DEPOLL_WEB_ENABLE_UNDEFINED_SANITIZER=${{ matrix.sanitizer == 'others' && 'ON' || 'OFF' }} \
-              -DEPOLL_WEB_ENABLE_THREAD_SANITIZER=${{ matrix.sanitizer == 'others' && 'ON' || 'OFF' }} \
-              -DEPOLL_WEB_ENABLE_MOLD=ON \
-              -DEPOLL_WEB_ENABLE_AVX2=ON \
-              $GITHUB_WORKSPACE
+        mkdir -p build
+        tar -czf build/my_artifact.tar.gz my_project_folder/
 
-    - name: Build
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: my-artifact
+        path: build/my_artifact.tar.gz
+
+  download:
+    runs-on: ubuntu-24.04
+    needs: build  # Ensure the build job completes before downloading
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: my-artifact
+        path: ./downloaded  # Path to store the downloaded artifact
+
+    - name: Extract the downloaded artifact
       run: |
-        cmake --build build --config ${{matrix.build_type}} --parallel
+        tar -xvzf ./downloaded/my_artifact.tar.gz -C ./downloaded
