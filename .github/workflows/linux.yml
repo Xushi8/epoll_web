@@ -56,26 +56,8 @@ jobs:
       run: |
         cmake --build build --config ${{matrix.build_type}} --parallel
 
-    - name: Upload build directory as artifact
-      uses: actions/upload-artifact@v3
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
       with:
-        name: build-artifacts
-        path: build/  # 上传整个 build 目录
-
-  download:
-    runs-on: ubuntu-24.04
-    needs: build  # 需要等待 build 完成后才会执行
-    steps:
-    - name: Download artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: build-artifacts
-        path: ./downloaded  # 下载到指定路径
-
-    - name: Extract and use the artifact
-      run: |
-        # 假设你下载了整个 build 目录
-        # 比如，my_project_binary 会在 build 目录下
-        mv ./downloaded/build/my_project_binary ./my_project_binary
-        # 可以在这里验证下载的构建产物
-        ./my_project_binary --help
+        name: epoll_web
+        path: build/
