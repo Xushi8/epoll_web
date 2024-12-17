@@ -44,12 +44,12 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
               -Bbuild \
               -GNinja \
-              -DEPOLL_WEB_ENABLE_STRICT_STL_CHECKS=ON \
-              -DEPOLL_WEB_ENABLE_ADDRESS_SANITIZER=${{ matrix.sanitizer == 'address' && 'ON' || 'OFF' }} \
-              -DEPOLL_WEB_ENABLE_UNDEFINED_SANITIZER=${{ matrix.sanitizer == 'others' && 'ON' || 'OFF' }} \
-              -DEPOLL_WEB_ENABLE_THREAD_SANITIZER=${{ matrix.sanitizer == 'others' && 'ON' || 'OFF' }} \
-              -DEPOLL_WEB_ENABLE_MOLD=ON \
-              -DEPOLL_WEB_ENABLE_AVX2=ON \
+              -DEPOLL_WEB_STRICT_STL_CHECKS=ON \
+              -DEPOLL_WEB_ADDRESS_SANITIZER=${{ matrix.sanitizer == 'address' && 'ON' || 'OFF' }} \
+              -DEPOLL_WEB_UNDEFINED_SANITIZER=${{ matrix.sanitizer == 'others' && 'ON' || 'OFF' }} \
+              -DEPOLL_WEB_THREAD_SANITIZER=${{ matrix.sanitizer == 'others' && 'ON' || 'OFF' }} \
+              -DEPOLL_WEB_MOLD=ON \
+              -DEPOLL_WEB_AVX2=ON \
               $GITHUB_WORKSPACE
 
     - name: Build
