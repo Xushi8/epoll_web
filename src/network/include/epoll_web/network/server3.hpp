@@ -24,17 +24,16 @@ inline void server3(uint16_t port)
         for (size_t i = 0; i < n; i++)
         {
             int curfd = events[i].data.fd;
-            if (curfd == sock.get_fd())
+            if (curfd == sock.get_fd()) // accept
             {
                 int client_fd = sock.accept();
                 ep.add_fd(client_fd, EPOLLIN);
             }
-            else
+            else // recv
             {
                 std::array<char, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 
                 int len = recv(curfd, buf.data(), buf.size() - 1, 0);
-
                 check_error("recv", len);
 
                 if (len > 0)
