@@ -10,8 +10,7 @@ inline void check_error(std::string_view msg, int res)
 {
     if (res < 0) [[unlikely]]
     {
-        spdlog::warn("{}: {}", msg, strerror(errno));
-        throw;
+        throw std::runtime_error(fmt::format("{}: {}", msg, strerror(errno)));
     }
 }
 
