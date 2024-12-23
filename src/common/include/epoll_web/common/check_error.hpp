@@ -18,8 +18,7 @@ inline void check_error(std::string_view msg, void* ptr)
 {
     if (ptr == nullptr) [[unlikely]]
     {
-        spdlog::warn("{}: {}", msg, strerror(errno));
-        throw;
+        throw std::runtime_error(fmt::format("{}: {}", msg, strerror(errno)));
     }
 }
 
