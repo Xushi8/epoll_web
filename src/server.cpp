@@ -26,14 +26,14 @@ int main(int argc, char** argv)
 
     if (argc != 2)
     {
-        spdlog::error("Usage: {} <port>\n", argv[0]);
+        spdlog::error("Usage: {} <port>", argv[0]);
         exit(1);
     }
 
     std::optional<uint16_t> port = epoll_web::from_string<uint16_t>(argv[1]);
     if (!port.has_value()) [[unlikely]]
     {
-        spdlog::error("Invalid port\n");
+        spdlog::error("Invalid port format: {}", argv[1]);
         exit(1);
     }
 
