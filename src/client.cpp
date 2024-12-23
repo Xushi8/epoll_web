@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 
     if (argc != 3)
     {
-        spdlog::error("Usage: {} <ip/domain> <port>\n", argv[0]);
+        spdlog::error("Usage: {} <ip/domain> <port>", argv[0]);
         exit(1);
     }
 
