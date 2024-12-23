@@ -17,11 +17,7 @@ foreach(name ${EPOLL_WEB_TARGETS})
 
         # package
         Threads::Threads
-        mimalloc
         Boost::headers
-
-        
-        RE2::re2
 
         # external
     )
