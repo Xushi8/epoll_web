@@ -56,8 +56,7 @@ inline void server3(uint16_t port)
                     }
                     else
                     {
-                        spdlog::error("recv: {}", strerror(errno));
-                        throw;
+                        throw std::runtime_error(fmt::format("recv: {}", strerror(errno)));
                     }
                 }
             }
