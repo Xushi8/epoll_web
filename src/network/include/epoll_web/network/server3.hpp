@@ -34,7 +34,6 @@ inline void server3(uint16_t port)
                 std::array<char, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 
                 int len = recv(curfd, buf.data(), buf.size() - 1, 0);
-                check_error("recv", len);
 
                 if (len > 0)
                 {
@@ -46,6 +45,20 @@ inline void server3(uint16_t port)
                     spdlog::info("客户端已经断开连接");
                     ep.delete_fd(curfd);
                     close(curfd);
+                }
+                else
+                {
+                    if (errno == ECONNRESET)
+                    {
+                        spdlog::info("客户端已经断开连接");
+                        ep.delete_fd(curfd);
+                        close(curfd);
+                    }
+                    else
+                    {
+                        spdlog::error("recv: {}", strerror(errno));
+                        throw;
+                    }
                 }
             }
         }
