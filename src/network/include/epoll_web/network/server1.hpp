@@ -55,11 +55,11 @@ inline void server1(uint16_t port)
         // 接收数据
         char buf[1024];
         memset(buf, 0, sizeof(buf));
-        int len = read(cfd, buf, sizeof(buf));
+        int len = recv(cfd, buf, sizeof(buf), 0);
         if (len > 0)
         {
             printf("客户端say: %s\n", buf);
-            ssize_t x = write(cfd, buf, len);
+            ssize_t x = send(cfd, buf, len, 0);
             if (x == -1)
             {
                 fprintf(stderr, "回复错误\n");
@@ -73,7 +73,7 @@ inline void server1(uint16_t port)
         }
         else
         {
-            perror("read");
+            perror("recv");
             break;
         }
     }
