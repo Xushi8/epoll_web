@@ -83,11 +83,11 @@ inline void client1(std::string_view addr, std::string_view port)
         // 发送数据
         char buf[1024];
         sprintf(buf, "你好, 服务器...%d", number++);
-        std::ignore = write(fd, buf, strlen(buf) + 1);
+        std::ignore = send(fd, buf, strlen(buf) + 1, 0);
 
         // 接收数据
         memset(buf, 0, sizeof(buf));
-        int len = read(fd, buf, sizeof(buf));
+        int len = recv(fd, buf, sizeof(buf), 0);
         if (len > 0)
         {
             printf("服务器say: %s\n", buf);
@@ -99,7 +99,7 @@ inline void client1(std::string_view addr, std::string_view port)
         }
         else
         {
-            perror("read");
+            perror("recv");
             break;
         }
 
