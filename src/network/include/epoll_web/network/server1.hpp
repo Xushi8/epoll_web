@@ -55,7 +55,7 @@ inline void server1(uint16_t port)
         // 接收数据
         char buf[1024];
         memset(buf, 0, sizeof(buf));
-        int len = recv(cfd, buf, sizeof(buf), 0);
+        ssize_t len = recv(cfd, buf, sizeof(buf), 0);
         if (len > 0)
         {
             printf("客户端say: %s\n", buf);

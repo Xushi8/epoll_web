@@ -76,7 +76,7 @@ inline void server2(uint16_t port)
             else
             {
                 char buf[1024];
-                int len = recv(curfd, buf, sizeof(buf), 0);
+                ssize_t len = recv(curfd, buf, sizeof(buf), 0);
                 if (len > 0)
                 {
                     printf("客户端 say: %s\n", buf);
