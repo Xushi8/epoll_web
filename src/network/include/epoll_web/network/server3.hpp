@@ -33,7 +33,7 @@ inline void server3(uint16_t port)
             {
                 std::array<char, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 
-                int len = recv(curfd, buf.data(), buf.size() - 1, 0);
+                ssize_t len = recv(curfd, buf.data(), buf.size() - 1, 0);
 
                 if (len > 0)
                 {

@@ -87,7 +87,7 @@ inline void client1(std::string_view addr, std::string_view port)
 
         // 接收数据
         memset(buf, 0, sizeof(buf));
-        int len = recv(fd, buf, sizeof(buf), 0);
+        ssize_t len = recv(fd, buf, sizeof(buf), 0);
         if (len > 0)
         {
             printf("服务器say: %s\n", buf);
