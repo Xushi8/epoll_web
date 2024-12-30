@@ -1,10 +1,8 @@
-#include <iostream>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <pwd.h>
 #include <grp.h>
 #include <ctime>
-#include <iomanip>
 #include <fmt/core.h>
 #include <cstring>
 
@@ -13,7 +11,7 @@ namespace
 
 void print_permissions(mode_t mode)
 {
-    char permissions[10];
+    char permissions[11];
 
     // 文件类型
     if (S_ISDIR(mode))
@@ -32,16 +30,20 @@ void print_permissions(mode_t mode)
     permissions[7] = (mode & S_IROTH) ? 'r' : '-';
     permissions[8] = (mode & S_IWOTH) ? 'w' : '-';
     permissions[9] = (mode & S_IXOTH) ? 'x' : '-';
+    permissions[10] = '\0';
 
     fmt::print("{}", permissions);
 }
 
 void print_file_info(const struct dirent* entry, const struct stat& file_stat)
 {
+    // 打印文件权限
     print_permissions(file_stat.st_mode);
 
+    // 打印硬链接数量
     fmt::print(" {}", file_stat.st_nlink);
 
+    // 打印文件所属用户
     struct passwd* owner = getpwuid(file_stat.st_uid);
     fmt::print(" {}", (owner ? owner->pw_name : std::to_string(file_stat.st_uid)));
 
@@ -73,7 +75,7 @@ void list_directory(const char* path)
     }
 
     struct dirent* entry;
-    struct stat file_stat;
+    struct stat file_stat; // NOLINT(cppcoreguidelines-pro-type-member-init)
 
     while ((entry = readdir(dir)) != nullptr)
     {
@@ -83,7 +85,6 @@ void list_directory(const char* path)
             continue;
         }
 
-        // 获取文件的详细信息
         std::string full_path = std::string(path) + "/" + entry->d_name;
         if (stat(full_path.c_str(), &file_stat) == -1)
         {
@@ -91,14 +92,13 @@ void list_directory(const char* path)
             continue;
         }
 
-        // 打印文件的详细信息
         print_file_info(entry, file_stat);
     }
 
     closedir(dir);
 }
 
-// 递归列出目录及其子目录的所有文件
+// 递归列出目录中的文件
 void list_directory_recursive(const char* path)
 {
     DIR* dir = opendir(path);
@@ -109,15 +109,12 @@ void list_directory_recursive(const char* path)
     }
 
     struct dirent* entry;
-    struct stat file_stat;
+    struct stat file_stat; // NOLINT(cppcoreguidelines-pro-type-member-init)
 
-    // 打印当前目录的文件
     fmt::print("\n{}:\n", path);
 
-    // 遍历目录中的每个文件
     while ((entry = readdir(dir)) != nullptr)
     {
-        // 跳过 "." 和 ".."
         if (std::strcmp(entry->d_name, ".") == 0 || std::strcmp(entry->d_name, "..") == 0)
         {
             continue;
@@ -145,13 +142,37 @@ void list_directory_recursive(const char* path)
 
 int main(int argc, char* argv[])
 {
-    const char* path = (argc == 2) ? argv[1] : ".";
-
-    list_directory(path);
-
-    if (argc == 3)
+    using namespace std::string_view_literals;
+    if (argc == 1)
     {
-        list_directory_recursive(path);
+        list_directory(".");
+    }
+    else if (argc == 2)
+    {
+        if (argv[1] == "-R"sv)
+        {
+            list_directory_recursive(".");
+        }
+        else
+        {
+            list_directory(argv[1]);
+        }
+    }
+    else if (argc == 3)
+    {
+        if (argv[1] == "-R"sv)
+        {
+            list_directory_recursive(argv[2]);
+        }
+        else
+        {
+            list_directory_recursive(argv[1]);
+        }
+    }
+    else
+    {
+        fmt::print(stderr, "Only support -R\n");
+        exit(1);
     }
 
     return 0;
