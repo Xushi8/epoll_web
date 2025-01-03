@@ -19,6 +19,8 @@ foreach(name ${EPOLL_WEB_TARGETS})
         Threads::Threads
         Boost::headers
 
+        NCURSES::ncurses
+
         # external
     )
 
