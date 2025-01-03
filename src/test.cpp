@@ -2,33 +2,27 @@
 
 int main()
 {
-    // 初始化 ncurses
-    initscr();            // 初始化 ncurses 环境
-    raw();                // 禁用行缓冲
-    keypad(stdscr, TRUE); // 启用特殊键的处理
-    noecho();             // 禁止输入字符回显
+    initscr();
 
-    printw("Press any key to exit...\n"); // 在屏幕上打印提示信息
-    refresh();                            // 刷新屏幕以显示内容
+    int scrLine, scrCol;
+    getmaxyx(stdscr, scrLine, scrCol);     // 获取标准屏幕的行/列数
+    move((scrLine / 2) - 1, (scrCol / 2) - 1); // 将光标移至屏幕中央
+    printw("Hello World!");
 
-    int ch = getch(); // 等待用户输入一个字符
+    WINDOW* upwin = subwin(stdscr, scrLine / 2, scrCol, 0, 0);
+    WINDOW* downwin = subwin(stdscr, scrLine / 2, scrCol, scrLine / 2, 0);
 
-    // 根据用户输入做出响应
-    if (ch == KEY_F(1))
-    {
-        printw("You pressed F1!\n");
-    }
-    else
-    {
-        printw("You pressed %c!\n", ch);
-    }
-    refresh();
+    box(upwin, '|', '+');
+    box(downwin, '|', '+');
+    touchwin(stdscr);
 
-    // 等待一段时间后退出
+    wmove(downwin, 1, 1);
+    // refresh();
+    int a;
+    wscanw(downwin, "%d", &a);
+
     getch();
 
     // 清理并退出 ncurses 环境
     endwin();
-
-    return 0;
 }
