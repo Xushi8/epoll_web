@@ -5,6 +5,8 @@ if(EPOLL_WEB_STATIC_EXTERNAL_LIB)
     set(Boost_USE_STATIC_LIBS ON)
 endif()
 
+find_package(NCURSES REQUIRED)
+
 # Some package always dynamic link
 # dynamic link begin
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".dll" ".so")

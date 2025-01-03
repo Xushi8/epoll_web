@@ -1,0 +1,22 @@
+include(FindPackageHandleStandardArgs)
+
+find_path(NCURSES_INCLUDE_DIR NAMES ncurses.h)
+find_library(NCURSES_LIBRARIES NAMES ncurses libncurses)
+
+if(NOT NCURSES_INCLUDE_DIR OR NOT NCURSES_LIBRARIES)
+    find_package_handle_standard_args(NCURSES REQUIRED_VARS NCURSES_INCLUDE_DIR NCURSES_LIBRARIES)
+    mark_as_advanced(NCURSES_INCLUDE_DIR NCURSES_LIBRARIES)
+    return()
+endif()
+
+set(NCURSES_FOUND TRUE)
+
+add_library(NCURSES::ncurses INTERFACE IMPORTED)
+set_target_properties(NCURSES::ncurses PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${NCURSES_INCLUDE_DIR}"
+    INTERFACE_LINK_LIBRARIES "${NCURSES_LIBRARIES}"
+)
+
+find_package_handle_standard_args(NCURSES DEFAULT_MSG NCURSES_INCLUDE_DIR NCURSES_LIBRARIES)
+
+mark_as_advanced(NCURSES_INCLUDE_DIR NCURSES_LIBRARIES)
