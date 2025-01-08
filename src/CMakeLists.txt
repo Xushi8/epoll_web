@@ -1,5 +1,6 @@
 add_subdirectory(common)
 add_subdirectory(network)
+add_subdirectory(game)
 
 set(EPOLL_WEB_TARGETS
     server
@@ -14,6 +15,7 @@ foreach(name ${EPOLL_WEB_TARGETS})
         # src
         epoll_web_common
         epoll_web_network
+        epoll_web_game
 
         # package
         Threads::Threads
