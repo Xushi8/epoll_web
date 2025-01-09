@@ -40,7 +40,7 @@ int main(int argc, char** argv)
     setlocale(LC_ALL, "C.UTF-8");
 #endif
 
-    epoll_web::set_default_log({.level = spdlog::level::trace, .log_name = "epoll_web", .with_time = true});
+    epoll_web::set_default_log({.level = spdlog::level::debug, .log_name = "epoll_web", .with_time = true});
 
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
