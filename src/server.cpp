@@ -7,7 +7,25 @@
 #include <windows.h>
 #endif
 
+#include <csignal>
 
+namespace
+{
+
+void signal_handler([[maybe_unused]] int signal)
+{
+    if (signal == SIGINT)
+    {
+        spdlog::info("ctrl + c pressed");
+    }
+    else if (signal == SIGTERM)
+    {
+        spdlog::info("Process is killed");
+    }
+    exit(1);
+}
+
+} // namespace
 
 int main(int argc, char** argv)
 {
@@ -23,6 +41,9 @@ int main(int argc, char** argv)
 #endif
 
     epoll_web::set_default_log({.level = spdlog::level::trace, .log_name = "epoll_web", .with_time = true});
+
+    signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
 
     if (argc != 2)
     {
