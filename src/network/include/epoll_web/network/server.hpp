@@ -10,7 +10,7 @@
 
 EPOLL_WEB_BEGIN_NAMESPACE
 
-inline void server3(uint16_t port)
+inline void server(uint16_t port)
 {
     Socket sock;
     sock.bind(port);

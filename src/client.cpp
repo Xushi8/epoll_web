@@ -1,4 +1,4 @@
-#include <epoll_web/network/client1.hpp>
+#include <epoll_web/network/client.hpp>
 #include <epoll_web/common/log.hpp>
 
 #include <clocale>
@@ -27,5 +27,5 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    epoll_web::client1(argv[1], argv[2]);
+    epoll_web::client(argv[1], argv[2]);
 }

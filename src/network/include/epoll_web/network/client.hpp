@@ -23,7 +23,7 @@
 
 EPOLL_WEB_BEGIN_NAMESPACE
 
-inline void client1(std::string_view addr, std::string_view port)
+inline void client(std::string_view addr, std::string_view port)
 {
     struct addrinfo hints = {};
     int check_error;

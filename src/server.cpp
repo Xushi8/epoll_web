@@ -1,13 +1,13 @@
 #include <epoll_web/common/log.hpp>
-#include <epoll_web/network/server1.hpp>
-#include <epoll_web/network/server2.hpp>
-#include <epoll_web/network/server3.hpp>
+#include <epoll_web/network/server.hpp>
 #include <epoll_web/common/string_convert.hpp>
 
 #include <clocale>
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
+
 
 int main(int argc, char** argv)
 {
@@ -37,7 +37,5 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    // epoll_web::server1(*port);
-    // epoll_web::server2(*port);
-    epoll_web::server3(*port);
+    epoll_web::server(*port);
 }
