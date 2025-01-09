@@ -107,7 +107,7 @@ inline void client1(std::string_view addr, std::string_view port)
     t_getch.detach();
 
     char buf[65536];
-    ssize_t len;
+    ssize_t len{};
     try
     {
         while (1)
