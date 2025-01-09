@@ -19,6 +19,7 @@ inline void server3(uint16_t port)
     Epoll ep;
     ep.add_fd(sock.get_fd(), EPOLLIN | EPOLLET);
 
+    std::mutex mtx;
     boost::unordered::unordered_flat_set<int> all_fd;
 
     std::jthread t_recv(
@@ -50,7 +51,14 @@ inline void server3(uint16_t port)
                                     }
                                 }
                                 check_error("setnonblocking", setnonblocking(client_fd));
+
+                                auto head = epoll_web::Game::get_instance().get_unique_head();
+                                epoll_web::Snake snake{'*', client_fd, head};
+                                epoll_web::Game::get_instance().add_snake(std::move(snake));
+                                spdlog::info("new connection");
+
                                 ep.add_fd(client_fd, EPOLLIN | EPOLLET);
+                                std::scoped_lock lock{mtx};
                                 all_fd.emplace(client_fd);
                             }
                         }
@@ -64,20 +72,18 @@ inline void server3(uint16_t port)
 
                                 if (len > 0)
                                 {
-                                    spdlog::trace("客户端说: {}", std::string_view(buf.data(), len));
+                                    spdlog::trace("客户端 {} 说: {}", curfd, std::string_view(buf.data(), len));
 
-                                    std::string_view sv(buf.data(), len);
-                                    using namespace std::string_view_literals;
                                     Snake& snake = Game::get_instance().get_snake(curfd);
-                                    if (sv == "w"sv)
+                                    if (buf[0] == 'w' || buf[0] == 'W')
                                     {
                                         snake.change_dir(Direction::UP);
                                     }
-                                    else if (sv == "s"sv)
+                                    else if (buf[0] == 's' || buf[0] == 'S')
                                     {
                                         snake.change_dir(Direction::DOWN);
                                     }
-                                    else if (sv == "a"sv)
+                                    else if (buf[0] == 'a' || buf[0] == 'A')
                                     {
                                         snake.change_dir(Direction::LEFT);
                                     }
@@ -92,6 +98,7 @@ inline void server3(uint16_t port)
                                     Game::get_instance().delete_snake(curfd);
                                     ep.delete_fd(curfd);
                                     close(curfd);
+                                    std::scoped_lock lock{mtx};
                                     all_fd.erase(curfd);
                                     break;
                                 }
@@ -107,6 +114,7 @@ inline void server3(uint16_t port)
                                         Game::get_instance().delete_snake(curfd);
                                         ep.delete_fd(curfd);
                                         close(curfd);
+                                        std::scoped_lock lock{mtx};
                                         all_fd.erase(curfd);
                                         break;
                                     }
@@ -124,6 +132,7 @@ inline void server3(uint16_t port)
                         Game::get_instance().delete_snake(curfd);
                         ep.delete_fd(curfd);
                         close(curfd);
+                        std::scoped_lock lock{mtx};
                         all_fd.erase(curfd);
                     }
                 }
@@ -135,13 +144,21 @@ inline void server3(uint16_t port)
         {
             while (1)
             {
+                epoll_web::Game::get_instance().update();
+
                 // 序列化
                 nlohmann::json j = epoll_web::Game::get_instance();
                 std::string s = j.dump();
 
-                for (int fd : all_fd)
+                spdlog::trace("json: {}", s);
+
+                spdlog::debug("connection count: {}", all_fd.size());
                 {
-                    send(fd, s.c_str(), s.size(), 0);
+                    std::scoped_lock lock{mtx};
+                    for (int fd : all_fd)
+                    {
+                        send(fd, s.c_str(), s.size() + 1, 0);
+                    }
                 }
 
                 using namespace std::chrono_literals;
