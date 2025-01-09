@@ -1,11 +1,14 @@
 #pragma once
 
 #include <epoll_web/common/common.hpp>
+#include <epoll_web/common/log.hpp>
+#include <epoll_web/game/game.hpp>
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <ncurses.h>
 #include <thread>
 #include <unistd.h>
 #include <netdb.h>
@@ -14,11 +17,12 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include <nlohmann/json.hpp>
+
 EPOLL_WEB_BEGIN_NAMESPACE
 
 inline void client1(std::string_view addr, std::string_view port)
 {
-    // 1. 获取服务器地址信息
     struct addrinfo hints = {};
     int check_error;
 
@@ -26,7 +30,6 @@ inline void client1(std::string_view addr, std::string_view port)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    // 使用 getaddrinfo 获取服务器的地址信息
     struct addrinfo* res;
     check_error = getaddrinfo(addr.data(), port.data(), &hints, &res); // NOLINT(bugprone-suspicious-stringview-data-usage)
     if (check_error != 0)
@@ -35,7 +38,6 @@ inline void client1(std::string_view addr, std::string_view port)
         exit(1);
     }
 
-    // 处理返回的 IPv6 地址
     struct addrinfo* p;
     for (p = res; p != nullptr; p = p->ai_next)
     {
@@ -55,46 +57,70 @@ inline void client1(std::string_view addr, std::string_view port)
         }
     }
 
-    // 2. 创建套接字
     int fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (fd == -1)
     {
         perror("socket");
-        freeaddrinfo(res); // 释放 getaddrinfo 返回的内存
+        freeaddrinfo(res);
         exit(1);
     }
 
-    // 3. 连接服务器
     check_error = connect(fd, res->ai_addr, res->ai_addrlen);
     if (check_error == -1)
     {
         perror("connect");
         close(fd);
-        freeaddrinfo(res); // 释放 getaddrinfo 返回的内存
+        freeaddrinfo(res);
         exit(1);
     }
+    freeaddrinfo(res);
 
-    freeaddrinfo(res); // 连接成功后可以释放 res
+    std::jthread t_getch([fd]
+        {
+            while (1)
+            {
+                int ch = getch();
+                if (ch == 'q')
+                {
+                    return;
+                }
 
-    // 4. 和服务器端通信
-    int number = 0;
+                if (ch == 'w' || ch == 'a' || ch == 's' || ch == 'd')
+                {
+                    char tmp[2];
+                    tmp[0] = ch;
+                    tmp[1] = '\0';
+                    int res = send(fd, tmp, 1, 0);
+                    if (res == -1)
+                    {
+                        break;
+                    }
+                }
+            } });
+    t_getch.detach();
+
+    // 初始化 ncurses
+    initscr();
+    noecho();
+    curs_set(0);
+
     while (1)
     {
-        // 发送数据
-        char buf[1024];
-        sprintf(buf, "你好, 服务器...%d", number++);
-        std::ignore = send(fd, buf, strlen(buf) + 1, 0);
+        char buf[65536];
 
-        // 接收数据
-        memset(buf, 0, sizeof(buf));
         ssize_t len = recv(fd, buf, sizeof(buf), 0);
         if (len > 0)
         {
-            printf("服务器say: %s\n", buf);
+            spdlog::trace("服务器说: {}", buf);
+
+            nlohmann::json j = nlohmann::json::parse(buf);
+            j.get_to(epoll_web::Game::get_instance());
+
+            epoll_web::Game::get_instance().print();
         }
         else if (len == 0)
         {
-            printf("服务器断开了连接...\n");
+            spdlog::info("服务器断开了连接");
             break;
         }
         else
@@ -102,12 +128,10 @@ inline void client1(std::string_view addr, std::string_view port)
             perror("recv");
             break;
         }
-
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(1s);
     }
 
     close(fd);
+    endwin();
 }
 
 EPOLL_WEB_END_NAMESPACE

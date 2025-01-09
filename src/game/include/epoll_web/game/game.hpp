@@ -77,6 +77,26 @@ struct Game
         }
     }
 
+    Snake& get_snake(int fd)
+    {
+        for (auto& snake : m_snakes)
+        {
+            if (snake.get_fd() == fd)
+            {
+                return snake;
+            }
+        }
+
+        unreachable();
+    }
+
+    void delete_snake(int fd)
+    {
+        auto it = std::ranges::find_if(m_snakes, [fd](Snake const& snake)
+            { return snake.get_fd() == fd; });
+        m_snakes.erase(it);
+    }
+
     void update()
     {
         std::ranges::for_each(m_snakes, [](Snake& snake)
