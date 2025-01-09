@@ -14,7 +14,7 @@ struct Game
 {
     Game(Game&&) noexcept = delete;
 
-    Game& get_instance();
+    static Game& get_instance();
 
     std::pair<uint32_t, uint32_t> get_unique_head()
     {
@@ -57,11 +57,13 @@ struct Game
     {
         for (auto& snack : m_snacks)
         {
-            if (m_visited.contains(snack.get_head()))
+            auto [x, y] = snack.get_head();
+            if (m_visited.contains(snack.get_head()) || (x == 0 || x == max_x || y == 0 || y == max_y))
             {
                 auto const& body = snack.get_body();
                 for (auto const& location : body)
                 {
+                    mvaddch(location.second, location.first, ' ');
                     m_visited.erase(location);
                 }
 
@@ -87,6 +89,7 @@ struct Game
     {
         std::ranges::for_each(m_snacks, [](Snack const& snack)
             { snack.print(); });
+        refresh();
     }
 
 private:
@@ -95,8 +98,8 @@ private:
     boost::unordered::unordered_flat_set<std::pair<uint32_t, uint32_t>> m_visited;
     boost::intrusive::bs_set<Snack> m_snacks;
 
-    static constexpr uint32_t max_x = 100;
-    static constexpr uint32_t max_y = 100;
+    static constexpr uint32_t max_x = 30;
+    static constexpr uint32_t max_y = 30;
 };
 
 EPOLL_WEB_END_NAMESPACE

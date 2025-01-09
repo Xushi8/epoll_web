@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <deque>
 #include <ncurses.h>
-#include <boost/intrusive/bs_set.hpp>
 #include <boost/intrusive/bs_set_hook.hpp>
 
 EPOLL_WEB_BEGIN_NAMESPACE
@@ -17,8 +16,8 @@ enum class Direction : uint8_t
     RIGHT,
 };
 
-constexpr int dx[4] = {-1, 1, 0, 0};
-constexpr int dy[4] = {0, 0, -1, 1};
+constexpr int dx[4] = {0, 0, -1, 1};
+constexpr int dy[4] = {-1, 1, 0, 0};
 
 struct Snack : public boost::intrusive::bs_set_base_hook<>
 {
