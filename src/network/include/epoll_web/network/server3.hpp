@@ -8,6 +8,13 @@
 
 EPOLL_WEB_BEGIN_NAMESPACE
 
+template <size_t N>
+inline void handle_recv(int fd, std::array<char, N> const& buf, ssize_t n)
+{
+    (void)fd;
+    std::string_view sv{buf.data(), static_cast<size_t>(n)};
+}
+
 inline void server3(uint16_t port)
 {
     Socket sock;
@@ -56,8 +63,9 @@ inline void server3(uint16_t port)
 
                         if (len > 0)
                         {
-                            spdlog::trace("客户端说: {}", std::string_view(buf.data(), len));
-                            check_error("send", send(curfd, buf.data(), len, 0));
+                            // spdlog::trace("客户端说: {}", std::string_view(buf.data(), len));
+                            // check_error("send", send(curfd, buf.data(), len, 0));
+                            handle_recv(curfd, buf, len);
                         }
                         else if (len == 0)
                         {
