@@ -82,13 +82,15 @@ inline void client(std::string_view addr, std::string_view port)
     noecho();
     curs_set(0);
 
-    std::jthread t_getch([fd]
+    std::atomic<bool> quit_flag{false};
+    std::jthread t_getch([fd, &quit_flag]
         {
             while (1)
             {
                 int ch = getch();
                 if (ch == 'q')
                 {
+                    quit_flag = true;
                     return;
                 }
 
@@ -110,7 +112,7 @@ inline void client(std::string_view addr, std::string_view port)
     ssize_t len{};
     try
     {
-        while (1)
+        while (!quit_flag)
         {
             len = recv(fd, buf, sizeof(buf), 0);
             if (len > 0)
