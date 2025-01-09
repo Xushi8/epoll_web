@@ -50,7 +50,11 @@ struct Snake
 
     void change_dir(Direction dir)
     {
-        m_dir = dir;
+        if (((m_dir == Direction::DOWN || m_dir == Direction::UP) && dir != Direction::DOWN && dir != Direction::UP)
+            || ((m_dir == Direction::LEFT || m_dir == Direction::RIGHT) && dir != Direction::LEFT && dir != Direction::RIGHT))
+        {
+            m_dir = dir;
+        }
     }
 
     void print() const
