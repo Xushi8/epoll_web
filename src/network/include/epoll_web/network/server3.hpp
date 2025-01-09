@@ -72,7 +72,7 @@ inline void server3(uint16_t port)
 
                                 if (len > 0)
                                 {
-                                    spdlog::trace("客户端 {} 说: {}", curfd, std::string_view(buf.data(), len));
+                                    spdlog::debug("客户端 {} 说: {}", curfd, std::string_view(buf.data(), len));
 
                                     Snake& snake = Game::get_instance().get_snake(curfd);
                                     if (buf[0] == 'w' || buf[0] == 'W')
@@ -128,7 +128,7 @@ inline void server3(uint16_t port)
                     }
                     catch (std::exception const& e)
                     {
-                        spdlog::warn("Exception: {}", e.what());
+                        spdlog::error("Exception: {}", e.what());
                         Game::get_instance().delete_snake(curfd);
                         ep.delete_fd(curfd);
                         close(curfd);
