@@ -64,7 +64,7 @@ struct Snack : public boost::intrusive::bs_set_base_hook<>
         m_body.emplace_back(body_head);
     }
 
-    int get_fd() const noexcept
+    constexpr int get_fd() const noexcept
     {
         return m_fd;
     }
@@ -74,12 +74,12 @@ struct Snack : public boost::intrusive::bs_set_base_hook<>
         return m_body.front();
     }
 
-    std::deque<std::pair<uint32_t, uint32_t>>& get_body() noexcept
+    constexpr std::deque<std::pair<uint32_t, uint32_t>>& get_body() noexcept
     {
         return m_body;
     }
 
-    std::deque<std::pair<uint32_t, uint32_t>> const& get_body() const noexcept
+    constexpr std::deque<std::pair<uint32_t, uint32_t>> const& get_body() const noexcept
     {
         return m_body;
     }

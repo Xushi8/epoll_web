@@ -15,7 +15,7 @@ inline void server3(uint16_t port)
     sock.listen();
 
     Epoll ep;
-    ep.add_fd(sock.get_fd(), EPOLLIN);
+    ep.add_fd(sock.get_fd(), EPOLLIN | EPOLLET);
 
     while (1)
     {
@@ -24,41 +24,74 @@ inline void server3(uint16_t port)
         for (size_t i = 0; i < n; i++)
         {
             int curfd = events[i].data.fd;
-            if (curfd == sock.get_fd()) // accept
+            try
             {
-                int client_fd = sock.accept();
-                ep.add_fd(client_fd, EPOLLIN);
+                if (curfd == sock.get_fd()) // accept
+                {
+                    while (1)
+                    {
+                        int client_fd = sock.accept();
+                        if (client_fd == -1)
+                        {
+                            if (errno == EAGAIN || errno == EWOULDBLOCK) [[likely]] // 没有数据了
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                throw std::runtime_error(fmt::format("accept: {}", strerror(errno)));
+                            }
+                        }
+                        check_error("setnonblocking", setnonblocking(client_fd));
+                        ep.add_fd(client_fd, EPOLLIN | EPOLLET);
+                    }
+                }
+                else // recv
+                {
+                    std::array<char, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
+
+                    while (1)
+                    {
+                        ssize_t len = recv(curfd, buf.data(), buf.size() - 1, 0);
+
+                        if (len > 0)
+                        {
+                            spdlog::trace("客户端说: {}", std::string_view(buf.data(), len));
+                            check_error("send", send(curfd, buf.data(), len, 0));
+                        }
+                        else if (len == 0)
+                        {
+                            spdlog::info("客户端已经断开连接");
+                            ep.delete_fd(curfd);
+                            close(curfd);
+                            break;
+                        }
+                        else
+                        {
+                            if (errno == EAGAIN || errno == EWOULDBLOCK) [[likely]] // 没有数据了
+                            {
+                                break;
+                            }
+                            else if (errno == ECONNRESET)
+                            {
+                                spdlog::info("客户端已经断开连接");
+                                ep.delete_fd(curfd);
+                                close(curfd);
+                                break;
+                            }
+                            else [[unlikely]]
+                            {
+                                throw std::runtime_error(fmt::format("recv: {}", strerror(errno)));
+                            }
+                        }
+                    }
+                }
             }
-            else // recv
+            catch (std::exception const& e)
             {
-                std::array<char, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
-
-                ssize_t len = recv(curfd, buf.data(), buf.size() - 1, 0);
-
-                if (len > 0)
-                {
-                    spdlog::trace("客户端说: {}", std::string_view(buf.data(), len));
-                    check_error("send", send(curfd, buf.data(), len, 0));
-                }
-                else if (len == 0)
-                {
-                    spdlog::info("客户端已经断开连接");
-                    ep.delete_fd(curfd);
-                    close(curfd);
-                }
-                else
-                {
-                    if (errno == ECONNRESET)
-                    {
-                        spdlog::info("客户端已经断开连接");
-                        ep.delete_fd(curfd);
-                        close(curfd);
-                    }
-                    else
-                    {
-                        throw std::runtime_error(fmt::format("recv: {}", strerror(errno)));
-                    }
-                }
+                spdlog::warn("Exception: {}", e.what());
+                ep.delete_fd(curfd);
+                close(curfd);
             }
         }
     }
