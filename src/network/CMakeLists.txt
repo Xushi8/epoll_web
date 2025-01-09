@@ -13,6 +13,7 @@ PUBLIC
 target_include_directories(epoll_web_network 
 PUBLIC
 ./include
+../game/include
 )
 
 # 使用这个链接参数可以保证全局变量也被导出到静态库
