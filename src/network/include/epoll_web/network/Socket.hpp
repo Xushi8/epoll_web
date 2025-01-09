@@ -76,7 +76,7 @@ struct Socket
 
 private:
     int m_fd;
-    uint16_t m_port;
+    uint16_t m_port{};
 };
 
 EPOLL_WEB_END_NAMESPACE
