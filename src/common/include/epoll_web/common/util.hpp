@@ -5,9 +5,9 @@
 
 EPOLL_WEB_BEGIN_NAMESPACE
 
-inline void setnonblocking(int fd)
+inline int setnonblocking(int fd)
 {
-    fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
+    return fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 }
 
 [[noreturn]] inline void unreachable()
