@@ -4,7 +4,8 @@
 #include <cstdint>
 #include <deque>
 #include <ncurses.h>
-#include <boost/intrusive/bs_set_hook.hpp>
+
+#include <nlohmann/json.hpp>
 
 EPOLL_WEB_BEGIN_NAMESPACE
 
@@ -16,21 +17,33 @@ enum class Direction : uint8_t
     RIGHT,
 };
 
+// clang-format off
+// Direction 序列化和反序列化
+NLOHMANN_JSON_SERIALIZE_ENUM(Direction, {
+    {Direction::UP, "UP"},
+    {Direction::DOWN, "DOWN"},
+    {Direction::LEFT, "LEFT"},
+    {Direction::RIGHT, "RIGHT"}
+})
+// clang-format on
+
 constexpr int dx[4] = {0, 0, -1, 1};
 constexpr int dy[4] = {-1, 1, 0, 0};
 
-struct Snack : public boost::intrusive::bs_set_base_hook<>
+struct Snake
 {
-    Snack(char character, int fd, std::pair<uint32_t, uint32_t> body_head) :
+    Snake(char character, int fd, std::pair<uint32_t, uint32_t> body_head) :
         m_character(character), m_fd(fd), m_body(1, body_head)
     {
     }
 
-    Snack(Snack&&) noexcept = default;
+    Snake() = default;
 
-    Snack& operator=(Snack&&) noexcept = default;
+    Snake(Snake&&) noexcept = default;
 
-    friend constexpr auto operator<=>(Snack const& lhs, Snack const& rhs) noexcept
+    Snake& operator=(Snake&&) noexcept = default;
+
+    friend constexpr auto operator<=>(Snake const& lhs, Snake const& rhs) noexcept
     {
         return lhs.get_fd() <=> rhs.get_fd();
     }
@@ -83,10 +96,29 @@ struct Snack : public boost::intrusive::bs_set_base_hook<>
         return m_body;
     }
 
+    // Snake 的序列化
+    friend void to_json(nlohmann::json& j, const Snake& snake)
+    {
+        j = nlohmann::json{
+            {"direction", snake.m_dir},
+            {"character", snake.m_character},
+            {"fd", snake.m_fd},
+            {"body", snake.m_body}};
+    }
+
+    // Snake 的反序列化
+    friend void from_json(const nlohmann::json& j, Snake& snake)
+    {
+        j.at("direction").get_to(snake.m_dir);
+        j.at("character").get_to(snake.m_character);
+        j.at("fd").get_to(snake.m_fd);
+        j.at("body").get_to(snake.m_body);
+    }
+
 private:
     Direction m_dir{Direction::DOWN};
-    char m_character;
-    int m_fd;
+    char m_character{};
+    int m_fd{};
     std::deque<std::pair<uint32_t, uint32_t>> m_body;
 };
 
