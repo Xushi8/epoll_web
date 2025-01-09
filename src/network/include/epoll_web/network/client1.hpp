@@ -19,6 +19,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include <fmt/format.h>
+
 EPOLL_WEB_BEGIN_NAMESPACE
 
 inline void client1(std::string_view addr, std::string_view port)
@@ -75,6 +77,11 @@ inline void client1(std::string_view addr, std::string_view port)
     }
     freeaddrinfo(res);
 
+    // 初始化 ncurses
+    initscr();
+    noecho();
+    curs_set(0);
+
     std::jthread t_getch([fd]
         {
             while (1)
@@ -90,8 +97,8 @@ inline void client1(std::string_view addr, std::string_view port)
                     char tmp[2];
                     tmp[0] = ch;
                     tmp[1] = '\0';
-                    int res = send(fd, tmp, 1, 0);
-                    if (res == -1)
+                    int error_check = send(fd, tmp, 2, 0);
+                    if (error_check == -1)
                     {
                         break;
                     }
@@ -99,39 +106,44 @@ inline void client1(std::string_view addr, std::string_view port)
             } });
     t_getch.detach();
 
-    // 初始化 ncurses
-    initscr();
-    noecho();
-    curs_set(0);
-
-    while (1)
+    char buf[65536];
+    ssize_t len;
+    try
     {
-        char buf[65536];
-
-        ssize_t len = recv(fd, buf, sizeof(buf), 0);
-        if (len > 0)
+        while (1)
         {
-            spdlog::trace("服务器说: {}", buf);
+            len = recv(fd, buf, sizeof(buf), 0);
+            if (len > 0)
+            {
+                spdlog::trace("服务器说: {}", buf);
 
-            nlohmann::json j = nlohmann::json::parse(buf);
-            j.get_to(epoll_web::Game::get_instance());
+                nlohmann::json j = nlohmann::json::parse(buf);
+                j.get_to(epoll_web::Game::get_instance());
 
-            epoll_web::Game::get_instance().print();
+                epoll_web::Game::get_instance().print();
+            }
+            else if (len == 0)
+            {
+                spdlog::info("服务器断开了连接");
+                break;
+            }
+            else
+            {
+                perror("recv");
+                break;
+            }
         }
-        else if (len == 0)
-        {
-            spdlog::info("服务器断开了连接");
-            break;
-        }
-        else
-        {
-            perror("recv");
-            break;
-        }
+    }
+    catch (std::exception const& e)
+    {
+        fmt::print(stderr, "len = {}, msg = {}\n", len, buf);
+        spdlog::error("Exception: {}", e.what());
     }
 
     close(fd);
     endwin();
+
+    fmt::print(stderr, "len = {}, msg = {}\n", len, buf);
 }
 
 EPOLL_WEB_END_NAMESPACE

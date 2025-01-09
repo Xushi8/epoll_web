@@ -63,7 +63,6 @@ struct Game
                 auto const& body = snake.get_body();
                 for (auto const& location : body)
                 {
-                    mvaddch(location.second, location.first, ' ');
                     m_visited.erase(location);
                 }
 
@@ -107,6 +106,19 @@ struct Game
 
     void print() const
     {
+        clear();
+        for (uint32_t i = 0; i < max_x; i++)
+        {
+            mvaddch(0, i, '#');
+            mvaddch(max_y, i, '#');
+        }
+
+        for (uint32_t j = 0; j < max_y; j++)
+        {
+            mvaddch(j, 0, '#');
+            mvaddch(j, max_x, '#');
+        }
+        
         std::ranges::for_each(m_snakes, [](Snake const& snake)
             { snake.print(); });
         refresh();

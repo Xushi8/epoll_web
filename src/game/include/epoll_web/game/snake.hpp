@@ -50,6 +50,11 @@ struct Snake
 
     void change_dir(Direction dir)
     {
+        if (m_dir != m_pre_dir)
+        {
+            m_dir = m_pre_dir;
+        }
+        
         if (((m_dir == Direction::DOWN || m_dir == Direction::UP) && dir != Direction::DOWN && dir != Direction::UP)
             || ((m_dir == Direction::LEFT || m_dir == Direction::RIGHT) && dir != Direction::LEFT && dir != Direction::RIGHT))
         {
@@ -71,6 +76,8 @@ struct Snake
         int tx = x + dx[static_cast<size_t>(m_dir)];
         int ty = y + dy[static_cast<size_t>(m_dir)];
         m_body.emplace_front(tx, ty);
+
+        m_pre_dir = m_dir;
     }
 
     void reset(std::pair<uint32_t, uint32_t> body_head)
@@ -121,6 +128,7 @@ struct Snake
 
 private:
     Direction m_dir{Direction::DOWN};
+    Direction m_pre_dir{Direction::DOWN};
     char m_character{};
     int m_fd{};
     std::deque<std::pair<uint32_t, uint32_t>> m_body;
