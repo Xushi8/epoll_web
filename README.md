@@ -4,12 +4,11 @@
 
 ## 项目特点
 
-- 使用 epoll ET 模式进行 IO 多路复用，提升性能。
+- 使用 `epoll` `ET` 模式进行 `I/O 多路复用`，提升性能。
 - 采用多线程进行 `send` 和 `receive`，进一步提高并发能力。
 - 使用 `cmake` 进行跨平台构建，确保正确安装和集成第三方库。
 - 警告选项启用了 `-Wall` `-Wextra` `-Wpedantic` 等，同时启用 `-Werror` 保证代码质量，所有编译选项参考 `cmake/compiler_options.cmake`。
-- 使用 Github Action 进行多编译器、多种优化选项、多种 `sanitizer` 的测试，确保能够在最新的操作系统、编译器以及各种复杂情况下通过测试。
-- 使用 Github Action 进行 Release，同时提供 amd64、arm64、riscv64、armhf 等多架构的二进制可执行程序。
+- 使用 `Github Action` 进行多编译器、多种优化选项、多种 `sanitizer` 的测试，确保能够在最新的操作系统、编译器以及各种复杂情况下通过测试。同时提供 `amd64`、`arm64`、`riscv64`、`armhf` 等多架构的二进制可执行程序。
 - 适当使用 `locale` 处理文件编码，避免字符集问题。
 - 对 `socket` 连接等复杂重复操作进行封装，降低使用复杂度，提高可读性。
 
