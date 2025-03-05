@@ -1,0 +1,350 @@
+name: Release Workflow
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  # amd64 job
+  release_amd64:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies (for amd64)
+        run: |
+          sudo apt update
+          sudo apt install p7zip-full cmake gcc-14 g++-14 mold ninja-build libboost1.83-dev libncurses-dev
+
+      - name: Configure amd64 release build
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_C_COMPILER=/usr/bin/gcc-14 \
+                -DCMAKE_CXX_COMPILER=/usr/bin/g++-14 \
+                -Bbuild_release_amd64 \
+                -GNinja \
+                -DEPOLL_WEB_STATIC_LIBSTDCXX=ON \
+                -DEPOLL_WEB_MOLD=ON
+
+      - name: Build amd64 release
+        run: |
+          cmake --build build_release_amd64 --parallel
+
+      - name: Create .tar.xz amd64 release artifact
+        run: |
+          tar -Jcvf release_amd64.tar.xz -C build_release_amd64 bin/
+
+      - name: Upload amd64 release assets to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release_amd64.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # amd64-avx2 job
+  release_amd64_avx2:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies (for amd64-avx2)
+        run: |
+          sudo apt update
+          sudo apt install p7zip-full cmake gcc-14 g++-14 mold ninja-build libboost1.83-dev libncurses-dev
+
+      - name: Configure amd64-avx2 release build
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_C_COMPILER=/usr/bin/gcc-14 \
+                -DCMAKE_CXX_COMPILER=/usr/bin/g++-14 \
+                -Bbuild_release_amd64_avx2 \
+                -GNinja \
+                -DEPOLL_WEB_STATIC_LIBSTDCXX=ON \
+                -DEPOLL_WEB_MOLD=ON \
+                -DEPOLL_WEB_AVX2=ON
+
+      - name: Build amd64-avx2 release
+        run: |
+          cmake --build build_release_amd64_avx2 --parallel
+
+      - name: Create .tar.xz amd64-avx2 release artifact
+        run: |
+          tar -Jcvf release_amd64_avx2.tar.xz -C build_release_amd64_avx2 bin/
+
+      - name: Upload avx2 release assets to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release_amd64_avx2.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # armhf job
+  release_armhf:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies (for armhf)
+        run: |
+          sudo rm /etc/apt/sources.list.d/ubuntu.sources
+
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "# other architecture" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ noble main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ noble-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ noble-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+
+          sudo dpkg --add-architecture armhf
+          sudo apt update
+          sudo apt install aptitude
+          sudo aptitude install -y cmake p7zip-full mold ninja-build
+          sudo aptitude install -y libglib2.0-dev-bin:armhf libglib2.0-dev-bin-linux:armhf
+          sudo aptitude install -y binutils-arm-linux-gnueabihf gcc-14-arm-linux-gnueabihf g++-14-arm-linux-gnueabihf libboost1.83-dev:armhf libncurses-dev:armhf
+
+      - name: Configure armhf release build
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_C_COMPILER=/usr/bin/arm-linux-gnueabihf-gcc-14 \
+                -DCMAKE_CXX_COMPILER=/usr/bin/arm-linux-gnueabihf-g++-14 \
+                -Bbuild_release_armhf \
+                -GNinja \
+                -DBASIC_PROJECT_STATIC_LIBSTDCXX=ON
+
+      - name: Build armhf release
+        run: |
+          cmake --build build_release_armhf --parallel
+
+      - name: Create .tar.xz armhf release artifact
+        run: |
+          tar -Jcvf release_armhf.tar.xz -C build_release_armhf bin/
+
+      - name: Upload armhf release assets to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release_armhf.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # arm64 job
+  release_arm64:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies (for arm64)
+        run: |
+          sudo rm /etc/apt/sources.list.d/ubuntu.sources
+
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "# other architecture" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ noble main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ noble-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ noble-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+
+          sudo dpkg --add-architecture arm64
+          sudo apt update
+          sudo apt install aptitude
+          sudo aptitude install -y cmake p7zip-full mold ninja-build
+          sudo aptitude install -y libglib2.0-dev-bin:arm64 libglib2.0-dev-bin-linux:arm64
+          sudo aptitude install -y gcc-14-aarch64-linux-gnu g++-14-aarch64-linux-gnu libboost1.83-dev:arm64 libncurses-dev:arm64
+
+      - name: Configure arm64 release build
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc-14 \
+                -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++-14 \
+                -Bbuild_release_arm64 \
+                -GNinja \
+                -DBASIC_PROJECT_STATIC_LIBSTDCXX=ON \
+                -DBASIC_PROJECT_MOLD=ON
+
+      - name: Build arm64 release
+        run: |
+          cmake --build build_release_arm64 --parallel
+
+      - name: Create .tar.xz arm64 release artifact
+        run: |
+          tar -Jcvf release_arm64.tar.xz -C build_release_arm64 bin/
+
+      - name: Upload arm64 release assets to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release_arm64.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # riscv64 job
+  release_riscv64:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies (for riscv64)
+        run: |
+          sudo rm /etc/apt/sources.list.d/ubuntu.sources
+
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "# other architecture" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports/ noble main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports/ noble-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=riscv64] http://ports.ubuntu.com/ubuntu-ports/ noble-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+
+          sudo dpkg --add-architecture riscv64
+          sudo apt update
+          sudo apt install aptitude
+          sudo aptitude install -y cmake p7zip-full mold ninja-build
+          sudo aptitude install -y libglib2.0-dev-bin:riscv64 libglib2.0-dev-bin-linux:riscv64
+          sudo aptitude install -y gcc-14-riscv64-linux-gnu g++-14-riscv64-linux-gnu libboost1.83-dev:riscv64 libncurses-dev:riscv64
+
+      - name: Configure riscv64 release build
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_C_COMPILER=/usr/bin/riscv64-linux-gnu-gcc-14 \
+                -DCMAKE_CXX_COMPILER=/usr/bin/riscv64-linux-gnu-g++-14 \
+                -Bbuild_release_riscv64 \
+                -GNinja \
+                -DBASIC_PROJECT_STATIC_LIBSTDCXX=ON \
+                -DBASIC_PROJECT_MOLD=ON
+
+      - name: Build riscv64 release
+        run: |
+          cmake --build build_release_riscv64 --parallel
+
+      - name: Create .tar.xz riscv64 release artifact
+        run: |
+          tar -Jcvf release_riscv64.tar.xz -C build_release_riscv64 bin/
+
+      - name: Upload riscv64 release assets to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release_riscv64.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ppc64el job
+  release_ppc64el:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies (for ppc64el)
+        run: |
+          sudo rm /etc/apt/sources.list.d/ubuntu.sources
+
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "# other architecture" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=ppc64el] http://ports.ubuntu.com/ubuntu-ports/ noble main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=ppc64el] http://ports.ubuntu.com/ubuntu-ports/ noble-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=ppc64el] http://ports.ubuntu.com/ubuntu-ports/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=ppc64el] http://ports.ubuntu.com/ubuntu-ports/ noble-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+
+          sudo dpkg --add-architecture ppc64el
+          sudo apt update
+          sudo apt install aptitude
+          sudo aptitude install -y cmake p7zip-full mold ninja-build
+          sudo aptitude install -y libglib2.0-dev-bin:ppc64el libglib2.0-dev-bin-linux:ppc64el
+          sudo aptitude install -y gcc-14-powerpc64le-linux-gnu g++-14-powerpc64le-linux-gnu libboost1.83-dev:ppc64el libncurses-dev:ppc64el
+
+      - name: Configure ppc64el release build
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_C_COMPILER=/usr/bin/powerpc64le-linux-gnu-gcc-14 \
+                -DCMAKE_CXX_COMPILER=/usr/bin/powerpc64le-linux-gnu-g++-14 \
+                -Bbuild_release_ppc64el \
+                -GNinja \
+                -DBASIC_PROJECT_STATIC_LIBSTDCXX=ON \
+                -DBASIC_PROJECT_MOLD=ON
+
+      - name: Build ppc64el release
+        run: |
+          cmake --build build_release_ppc64el --parallel
+
+      - name: Create .tar.xz ppc64el release artifact
+        run: |
+          tar -Jcvf release_ppc64el.tar.xz -C build_release_ppc64el bin/
+
+      - name: Upload ppc64el release assets to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release_ppc64el.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # s390x job
+  release_s390x:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies (for s390x)
+        run: |
+          sudo rm /etc/apt/sources.list.d/ubuntu.sources
+
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "# other architecture" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=s390x] http://ports.ubuntu.com/ubuntu-ports/ noble main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=s390x] http://ports.ubuntu.com/ubuntu-ports/ noble-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=s390x] http://ports.ubuntu.com/ubuntu-ports/ noble-backports main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+          echo "deb [arch=s390x] http://ports.ubuntu.com/ubuntu-ports/ noble-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list.d/ubuntu.list > /dev/null
+
+          sudo dpkg --add-architecture s390x
+          sudo apt update
+          sudo apt install aptitude
+          sudo aptitude install -y cmake p7zip-full mold ninja-build
+          sudo aptitude install -y libglib2.0-dev-bin:s390x libglib2.0-dev-bin-linux:s390x
+          sudo aptitude install -y gcc-14-s390x-linux-gnu g++-14-s390x-linux-gnu libboost1.83-dev:s390x libncurses-dev:s390x
+
+      - name: Configure s390x release build
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_C_COMPILER=/usr/bin/s390x-linux-gnu-gcc-14 \
+                -DCMAKE_CXX_COMPILER=/usr/bin/s390x-linux-gnu-g++-14 \
+                -Bbuild_release_s390x \
+                -GNinja \
+                -DBASIC_PROJECT_STATIC_LIBSTDCXX=ON \
+                -DBASIC_PROJECT_MOLD=ON \
+                -DBASIC_PROJECT_GUI=ON
+
+      - name: Build s390x release
+        run: |
+          cmake --build build_release_s390x --parallel
+
+      - name: Create .tar.xz s390x release artifact
+        run: |
+          tar -Jcvf release_s390x.tar.xz -C build_release_s390x bin/
+
+      - name: Upload s390x release assets to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release_s390x.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
